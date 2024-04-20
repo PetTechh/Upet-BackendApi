@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 
 class PetSchemaPost(BaseModel):
-    petOwnerId: int
     name: str
     breed: str
     species: str
