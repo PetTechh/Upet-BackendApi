@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from config.db import get_db
 from models.user import User, PetOwner, Veterinarian
 from models.veterinaryClinic import VeterinaryClinic
-from schemas.user import UserSchemaPost, UserSchemaGet, VeterinarianSchemaGet, VeterinarianSchemaPost, PetOwnerSchemaGet, PetOwnerSchemaPost
+from schemas.user import UserSchemaPost, UserSchemaGet, VeterinarianSchemaGet, VeterinarianSchemaPost, PetOwnerSchemaGet, PetOwnerSchemaPost, SubscriptionType
 from cryptography.fernet import Fernet
 from sqlalchemy.orm import Session
 
@@ -58,7 +58,7 @@ def create_veterinarian(user_id: int, veterinarian: VeterinarianSchemaPost, db: 
     db.commit()
     return new_veterinarian
 
-@users.post("/users/petowner/{user_id}", response_model=PetOwnerSchemaPost, status_code=status.HTTP_201_CREATED, tags=[tag])
+@users.post("/users/petowner/{user_id}", response_model=PetOwnerSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_petowner(user_id: int, petowner: PetOwnerSchemaPost, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
@@ -71,8 +71,11 @@ def create_petowner(user_id: int, petowner: PetOwnerSchemaPost, db: Session = De
     if user.registered== True:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario ya ha sido registrado")
 
+    if len(petowner.numberPhone) != 10:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El número de teléfono debe tener 10 dígitos.")
 
-    new_petowner = PetOwner(userId=user_id, numberPhone= petowner.numberPhone , subscriptionType=petowner.subscriptionType)
+
+    new_petowner = PetOwner(userId=user_id, numberPhone= petowner.numberPhone , subscriptionType=SubscriptionType.Basic)
     db.add(new_petowner)
     user.registered = True
     db.commit()
