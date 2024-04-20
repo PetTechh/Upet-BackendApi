@@ -1,5 +1,6 @@
-from fastapi import FastAPI
 from routes.user import users as user_router
+from fastapi import FastAPI
+
 from routes.veterinaryClinic import veterinary_clinics as veterinary_clinic_router
 from routes.pet import pets as pet_router
 from routes.appointment import appointments as appointment_router
