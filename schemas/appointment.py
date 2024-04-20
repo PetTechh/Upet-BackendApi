@@ -1,11 +1,12 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
 
 class AppointmentSchemaPost(BaseModel):
     datetime: str
     diagnosis: str
     treatment: str
     description: str
+    petId: int
+    veterinarianId: int
 
 class AppointmentSchemaGet(BaseModel):
     id: int
@@ -13,3 +14,5 @@ class AppointmentSchemaGet(BaseModel):
     diagnosis: str
     treatment: str
     description: str
+    petId: int
+    veterinarianId: int

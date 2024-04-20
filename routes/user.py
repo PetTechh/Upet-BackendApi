@@ -33,7 +33,7 @@ def create_user(user: UserSchemaPost, db: Session = Depends(get_db)):
     db.commit()
     return new_user
 
-@users.post("/users/veterinarian/{user_id}", response_model=VeterinarianSchemaPost, status_code=status.HTTP_201_CREATED, tags=[tag])
+@users.post("/users/veterinarian/{user_id}", response_model=VeterinarianSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_veterinarian(user_id: int, veterinarian: VeterinarianSchemaPost, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:

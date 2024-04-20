@@ -9,5 +9,7 @@ class Appointment(Base):
     diagnosis = Column(String(255))
     treatment = Column(String(255))
     description = Column(String(255))
+    petId = Column(Integer)
+    veterinarianId = Column(Integer)
     
 Base.metadata.create_all(bind=engine)
