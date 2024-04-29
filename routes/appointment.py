@@ -2,19 +2,21 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from config.db import get_db
 from models.appointment import Appointment
-from models.user import Veterinarian
+from models.veterinarian import Veterinarian
 from models.pet import Pet
 from schemas.appointment import AppointmentSchemaGet, AppointmentSchemaPost
 from datetime import datetime
 
 appointments = APIRouter()
-tag = "appointments"
+tag = "Appointments"
 
-@appointments.get("/appointments/", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+endpoint = "/appointments"
+
+@appointments.get(endpoint, response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_appointments(db: Session = Depends(get_db)):
     return db.query(Appointment).all()
 
-@appointments.get("/appointments/pet/{pet_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+@appointments.get(endpoint+ "/pet/{pet_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_appointments_by_pet_id(pet_id: int, db: Session = Depends(get_db)):
     pet= db.query(Pet).filter(Pet.id == pet_id).first()
     if not pet:
@@ -24,7 +26,7 @@ def get_appointments_by_pet_id(pet_id: int, db: Session = Depends(get_db)):
         print("La mascota no tiene citas registradas.")
     return appointments
 
-@appointments.get("/appointments/veterinarian/{veterinarian_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+@appointments.get(endpoint + "/veterinarian/{veterinarian_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depends(get_db)):
     veterinarian = db.query(Veterinarian).filter(Veterinarian.id == veterinarian_id).first()
     if not veterinarian:
@@ -39,7 +41,7 @@ def get_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depe
     return appointments
 
 
-@appointments.post("/appointments/", response_model=AppointmentSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
+@appointments.post(endpoint, response_model=AppointmentSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_appointment(appointment: AppointmentSchemaPost, db: Session = Depends(get_db)):
     
     if not is_valid_datetime_format(appointment.datetime):

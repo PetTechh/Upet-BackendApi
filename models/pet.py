@@ -11,4 +11,4 @@ class Pet(Base):
     weight = Column(DECIMAL)
     age = Column(Integer)
 
-Base.metadata.create_all(bind=engine)
+
