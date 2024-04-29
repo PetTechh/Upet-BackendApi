@@ -7,7 +7,7 @@ class PetSchemaPost(BaseModel):
     weight: float = Field(..., gt=0)  # Validar que weight sea mayor a 0
     age: int = Field(..., gt=0)  # Validar que age sea mayor a 0
 
-class PetSchemaGet(BaseModel):
+class PetSchemaResponse(BaseModel):
     id: int
     name: str
     petOwnerId: int

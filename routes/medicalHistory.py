@@ -1,36 +1,35 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from config.db import get_db
-from models.medicalHistory import Disease, MedicalHistory, MedicalHistoryDisease, Vaccination, MedicalHistoryVaccination
-from schemas.medicalHistory import DiseaseSchemaGet, DiseaseSchemaPost , MedicalHistorySchemaPost, MedicalHistorySchemaGet, MedicalHistoryVaccinationSchemaGet, MedicalHistoryVaccinationSchemaPost
-from schemas.medicalHistory import MedicalHistorySchemaGet, MedicalHistoryDiseaseSchemaGet, MedicalHistoryDiseaseSchemaPost, VaccinationSchemaGet, VaccinationSchemaPost
+
+from models.medicalHistory import MedicalHistory
+from models.medicalHistoryRelationships import MedicalHistoryDisease, MedicalHistoryVaccination
+from models.disease import Disease
+from models.vaccination import Vaccination
+
+from schemas.medicalHistory import  MedicalHistorySchemaPost, MedicalHistorySchemaGet
+from schemas.medicalHistoryRelationships import MedicalHistoryVaccinationSchemaGet, MedicalHistoryVaccinationSchemaPost
+from schemas.medicalHistory import MedicalHistorySchemaGet
+from schemas.medicalHistoryRelationships import MedicalHistoryDiseaseSchemaGet, MedicalHistoryDiseaseSchemaPost
+
+
+
 from models.pet import Pet
-medical_history_router = APIRouter()
-tag = "medical_history"
-
-@medical_history_router.get("/diseases/", response_model=list[DiseaseSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
-def get_diseases(db: Session = Depends(get_db)):
-    return db.query(Disease).all()
 
 
-@medical_history_router.post("/diseases/", response_model=DiseaseSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
-def create_disease(disease: DiseaseSchemaPost, db: Session = Depends(get_db)):
-    diseaseName = db.query(Disease).filter(Disease.name == disease.name).first()
-    if diseaseName:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La enfermedad ya existe.")
-
-    new_disease = Disease(**disease.dict())
-    db.add(new_disease)
-    db.commit()
-    return new_disease
+medical_historys = APIRouter()
+tag = "Medical Historys"
+endpoint = "/medical_historys"
 
 
-
-@medical_history_router.get("/medical_history/", response_model=list[MedicalHistorySchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+#Get All medical historys
+@medical_historys.get(endpoint, response_model=list[MedicalHistorySchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_medical_history(db: Session = Depends(get_db)):
     return db.query(MedicalHistory).all()
 
-@medical_history_router.get("/medical_history/{medical_history_id}/diseases/", response_model=list[MedicalHistoryDiseaseSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+
+#Get All diseases by medical history
+@medical_historys.get(endpoint + "/{medical_history_id}/diseases/", response_model=list[MedicalHistoryDiseaseSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_medical_history_diseases(medical_history_id: int, db: Session = Depends(get_db)):
     
     medical_history_diseases = db.query(MedicalHistoryDisease).filter(MedicalHistoryDisease.historyId == medical_history_id).all()
@@ -41,10 +40,8 @@ def get_medical_history_diseases(medical_history_id: int, db: Session = Depends(
     return medical_history_diseases
 
 
-
-
-
-@medical_history_router.post("/medical_history/", response_model=MedicalHistorySchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
+# Create a new medical history
+@medical_historys.post(endpoint, response_model=MedicalHistorySchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_medical_history(medical_history: MedicalHistorySchemaPost, db: Session = Depends(get_db)):
     
     pet = db.query(Pet).filter(Pet.id == medical_history.petId).first()
@@ -61,7 +58,8 @@ def create_medical_history(medical_history: MedicalHistorySchemaPost, db: Sessio
     return new_medical_history
 
 
-@medical_history_router.post("/medical_history_diseases/{medicalHistory_id}", response_model=MedicalHistoryDiseaseSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
+# Add a disease to an existing medical history
+@medical_historys.post(endpoint + "/{medicalHistory_id}", response_model=MedicalHistoryDiseaseSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_medical_history_disease(medicalHistory_id: int, medical_history_disease: MedicalHistoryDiseaseSchemaPost, db: Session = Depends(get_db)):
     medicalHistory = db.query(MedicalHistory).filter(MedicalHistory.id == medicalHistory_id).first()
     if not medicalHistory:
@@ -80,31 +78,8 @@ def create_medical_history_disease(medicalHistory_id: int, medical_history_disea
     return new_medical_history_disease
 
 
-
-
-
-
-@medical_history_router.get("/vaccinations/", response_model=list[VaccinationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
-def get_vaccinations(db: Session = Depends(get_db)):
-    return db.query(Vaccination).all()
-
-
-@medical_history_router.post("/vaccinations/", response_model=VaccinationSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
-def create_vaccination(vaccination: VaccinationSchemaPost, db: Session = Depends(get_db)):
-    vaccinationName = db.query(Vaccination).filter(Vaccination.name == vaccination.name).first()
-    if vaccinationName:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La vacuna ya existe.")
-    
-    new_vaccination = Vaccination(**vaccination.dict())
-    db.add(new_vaccination)
-    db.commit()
-    return new_vaccination
-
-
-
-
-
-@medical_history_router.post("/medical_history_vaccinations/{medicalHistory_id}", response_model=MedicalHistoryVaccinationSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
+# Add a vaccination to an existing medical history
+@medical_historys.post(endpoint+ "/{medicalHistory_id}", response_model=MedicalHistoryVaccinationSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_medical_history_vaccination(medicalHistory_id: int, medical_history_vaccination: MedicalHistoryVaccinationSchemaPost, db: Session = Depends(get_db)):
     medicalHistory = db.query(MedicalHistory).filter(MedicalHistory.id == medicalHistory_id).first()
     if not medicalHistory:
@@ -126,7 +101,9 @@ def create_medical_history_vaccination(medicalHistory_id: int, medical_history_v
     db.commit()
     return new_medical_history_vaccination
 
-@medical_history_router.get("/medical_history/{medical_history_id}/vaccinations/", response_model=list[MedicalHistoryVaccinationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+
+# Get All vaccinations by medical history
+@medical_historys.get(endpoint + "/{medical_history_id}/vaccinations/", response_model=list[MedicalHistoryVaccinationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_medical_history_vaccinations(medical_history_id: int, db: Session = Depends(get_db)):
     
     medical_history_vaccinations = db.query(MedicalHistoryVaccination).filter(MedicalHistoryVaccination.historyId == medical_history_id).all()
@@ -136,8 +113,8 @@ def get_medical_history_vaccinations(medical_history_id: int, db: Session = Depe
 
     return medical_history_vaccinations
 
-
-@medical_history_router.put("/medical_history_vaccinations/{medicalHistoryId}", response_model=MedicalHistoryVaccinationSchemaGet, status_code=status.HTTP_200_OK, tags=[tag])
+# Update vaccination information in a medical history
+@medical_historys.put(endpoint + "/{medicalHistoryId}", response_model=MedicalHistoryVaccinationSchemaGet, status_code=status.HTTP_200_OK, tags=[tag])
 def update_medical_history_vaccination(medicalHistoryId: int, medical_history_vaccination: MedicalHistoryVaccinationSchemaPost, db: Session = Depends(get_db)):
     vaccination_record = db.query(MedicalHistoryVaccination).filter(
         MedicalHistoryVaccination.historyId == medicalHistoryId,

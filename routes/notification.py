@@ -1,14 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from config.db import get_db
-from models.user import PetOwner
+from models.petOwner import PetOwner
 from models.notification import Notification
 from schemas.notification import NotificationSchemaGet, NotificationSchemaPost
 
 notifications = APIRouter()
-tag = "notifications"
+tag = "Notifications"
 
-@notifications.post("/notifications/", response_model=NotificationSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
+endpoint = "/notifications"
+
+@notifications.post(endpoint, response_model=NotificationSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_notification(notification: NotificationSchemaPost, db: Session = Depends(get_db)):
     pet_owner = db.query(PetOwner).filter(PetOwner.id == notification.petOwnerId).first()
     if not pet_owner:
@@ -19,11 +21,11 @@ def create_notification(notification: NotificationSchemaPost, db: Session = Depe
     db.commit()
     return new_notification
 
-@notifications.get("/notifications/", response_model=list[NotificationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+@notifications.get(endpoint, response_model=list[NotificationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_notifications(db: Session = Depends(get_db)):
     return db.query(Notification).all()
 
-@notifications.get("/notifications/petowner/{petowner_id}", response_model=list[NotificationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+@notifications.get(endpoint + "/petowner/{petowner_id}", response_model=list[NotificationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_notifications_by_petowner_id(petowner_id: int, db: Session = Depends(get_db)):
     pet_owner = db.query(PetOwner).filter(PetOwner.id == petowner_id).first()
     if not pet_owner:

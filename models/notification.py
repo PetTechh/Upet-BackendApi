@@ -12,4 +12,3 @@ class Notification(Base):
     datetime = Column(String(255))
 
 
-Base.metadata.create_all(bind=engine)
