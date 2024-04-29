@@ -1,14 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from enum import Enum
 
 class UserType(str, Enum):
     Vet = "Vet"
     Owner = "Owner"
-
-class SubscriptionType(str, Enum):
-    Basic = "Basic"
-    Advanced = "Advanced"
-    Pro = "Pro"
 
 class UserSchemaGet(BaseModel):
     id: int
@@ -26,19 +21,3 @@ class UserSchemaPost(BaseModel):
     userType: UserType
 
 
-class PetOwnerSchemaPost(BaseModel):
-    numberPhone: str
-
-class PetOwnerSchemaGet(BaseModel):
-    id: int
-    userId: int
-    numberPhone: str
-    subscriptionType: SubscriptionType
-    
-class VeterinarianSchemaPost(BaseModel):
-    clinicId :int
-    
-class VeterinarianSchemaGet(BaseModel):
-    id: int
-    userId: int
-    clinicId :int

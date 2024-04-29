@@ -12,4 +12,3 @@ class Appointment(Base):
     petId = Column(Integer)
     veterinarianId = Column(Integer)
     
-Base.metadata.create_all(bind=engine)

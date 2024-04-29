@@ -1,15 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from config.db import get_db
-from models.user import PetOwner
+from models.petOwner import PetOwner
 
-from schemas.pet import PetSchemaPost, PetSchemaGet
+from schemas.pet import PetSchemaPost, PetSchemaResponse
 from models.pet import Pet
 
 pets = APIRouter()
-tag = "pets"
+tag = "Pets"
+endpoint = "/pets"
 
-@pets.post("/pets/{petowner_id}", response_model=PetSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
+
+@pets.post( endpoint + "/{petowner_id}", response_model=PetSchemaResponse, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_pet(petowner_id: int, pet: PetSchemaPost, db: Session = Depends(get_db)):
     pet_owner = db.query(PetOwner).filter(PetOwner.id == petowner_id).first()
     if not pet_owner:
@@ -27,12 +29,12 @@ def create_pet(petowner_id: int, pet: PetSchemaPost, db: Session = Depends(get_d
     return new_pet
 
 
-@pets.get("/pets/", response_model=list[PetSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+@pets.get( endpoint, response_model=list[PetSchemaResponse], status_code=status.HTTP_200_OK, tags=[tag])
 def get_pets(db: Session = Depends(get_db)):
     return db.query(Pet).all()
 
 
-@pets.get("/pets/{petowner_id}", response_model=list[PetSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+@pets.get(  endpoint + "/{petowner_id}", response_model=list[PetSchemaResponse], status_code=status.HTTP_200_OK, tags=[tag])
 def get_pets_by_owner(petowner_id: int, db: Session = Depends(get_db)):
     pet_owner = db.query(PetOwner).filter(PetOwner.id == petowner_id).first()
     if not pet_owner:

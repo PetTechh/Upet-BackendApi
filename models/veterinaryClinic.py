@@ -11,4 +11,3 @@ class VeterinaryClinic(Base):
     hours = Column(String(255))
 
 
-Base.metadata.create_all(bind=engine)
