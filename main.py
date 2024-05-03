@@ -10,19 +10,23 @@ from routes.petOwner import pet_owners as pet_owner_router
 from routes.veterinarian import veterinarians as veterinarian_router
 from routes.disease import diseases as disease_router
 from routes.vaccination import vaccinations as vaccine_router
-
+from auth.routes.auth import auth as auth_router
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-app.include_router(user_router, prefix="/api")
-app.include_router(veterinary_clinic_router, prefix="/api")
-app.include_router(pet_router, prefix="/api")
-app.include_router(appointment_router, prefix="/api")
-app.include_router(notification_router, prefix="/api")
-app.include_router(medical_history_router, prefix="/api")
-app.include_router(pet_owner_router, prefix="/api")
-app.include_router(veterinarian_router, prefix="/api")
-app.include_router(disease_router, prefix="/api")
-app.include_router(vaccine_router, prefix="/api")
+
+prefix = "/api/v1"
+
+app.include_router(user_router, prefix= prefix)
+app.include_router(veterinary_clinic_router,  prefix= prefix)
+app.include_router(pet_router,  prefix= prefix)
+app.include_router(appointment_router,  prefix= prefix)
+app.include_router(notification_router,  prefix= prefix)
+app.include_router(medical_history_router,  prefix= prefix)
+app.include_router(pet_owner_router,  prefix= prefix)
+app.include_router(veterinarian_router, prefix= prefix)
+app.include_router(disease_router, prefix= prefix)
+app.include_router(vaccine_router,  prefix= prefix)
+app.include_router(auth_router,  prefix= prefix)
 
