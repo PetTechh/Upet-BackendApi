@@ -32,7 +32,6 @@ def get_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depe
     if not veterinarian:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El veterinario no existe.")
     
-    
     appointments = db.query(Appointment).filter(Appointment.veterinarianId == veterinarian_id).all()
     
     if not appointments:
