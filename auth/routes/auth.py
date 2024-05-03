@@ -18,7 +18,7 @@ endpoint = "/auth/users"
 tag = "Auth"
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = '197b2c371eas312ze#@1s1123'
+SECRET_KEY = '197b2c371eas312ze#@1ssdsasd1123'
 ALGORITHM = 'HS256'
 
 @auth.post(endpoint, status_code=status.HTTP_201_CREATED, tags=[tag])
