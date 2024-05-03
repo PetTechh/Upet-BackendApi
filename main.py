@@ -18,6 +18,7 @@ app = FastAPI()
 
 prefix = "/api/v1"
 
+app.include_router(auth_router,  prefix= prefix)
 app.include_router(user_router, prefix= prefix)
 app.include_router(veterinary_clinic_router,  prefix= prefix)
 app.include_router(pet_router,  prefix= prefix)
@@ -28,5 +29,4 @@ app.include_router(pet_owner_router,  prefix= prefix)
 app.include_router(veterinarian_router, prefix= prefix)
 app.include_router(disease_router, prefix= prefix)
 app.include_router(vaccine_router,  prefix= prefix)
-app.include_router(auth_router,  prefix= prefix)
 
