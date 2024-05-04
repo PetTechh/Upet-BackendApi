@@ -11,7 +11,7 @@ from models.user import User
 from  passlib.hash import bcrypt as func
 from auth.services.auth import AuthServices
 from ..config.auth import token_endpoint, tag, endpoint
-from schemas.auth import CreateUserRequest
+from auth.schemas.auth import CreateUserRequest
 auth = APIRouter()
 
 auth_services = AuthServices()
