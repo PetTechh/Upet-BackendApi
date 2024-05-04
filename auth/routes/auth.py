@@ -11,7 +11,7 @@ from models.user import User
 from  passlib.hash import bcrypt as func
 from auth.services.auth import AuthServices
 from ..config.auth import token_endpoint, tag, endpoint
-
+from schemas.auth import CreateUserRequest
 auth = APIRouter()
 
 auth_services = AuthServices()
@@ -42,20 +42,20 @@ async def sign_up(create_user_request: UserSchemaPost, db: Session=Depends(get_d
 
 
 
-@auth.post(token_endpoint, response_model=Token, tags=[tag])
-async def sign_in(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = auth_services.authenticate_user(form_data.username, form_data.password,db)
+
+@auth.post(token_endpoint, status_code=status.HTTP_200_OK, response_model=Token, tags=[tag])
+async def sign_in(create_user_request: CreateUserRequest, db: Session = Depends(get_db)):
+    user = auth_services.authenticate_user(create_user_request.email, create_user_request.password, db)
     
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password"
+            detail="Incorrect email or password"
         )
     
     token = auth_services.create_access_token(user.email, user.id, timedelta(hours=1))
 
     return {"access_token": token, "token_type": "bearer"}
-
 
 
 user_dependency = Annotated[dict, Depends(auth_services.get_current_user)]
