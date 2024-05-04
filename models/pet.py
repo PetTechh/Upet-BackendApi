@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DECIMAL, ForeignKey
+from sqlalchemy import Column, Integer, String, DECIMAL, ForeignKey, Enum
 from config.db import Base, engine
 
 class Pet(Base):
@@ -10,5 +10,5 @@ class Pet(Base):
     species = Column(String(255))
     weight = Column(DECIMAL)
     age = Column(Integer)
-
-
+    image_url = Column(String(255))
+    gender = Column(Enum("Male","Female", name='gender'))
