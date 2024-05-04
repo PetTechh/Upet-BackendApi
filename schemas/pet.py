@@ -14,7 +14,7 @@ class PetSchemaPost(BaseModel):
     weight: float = Field(..., gt=0)  # Validar que weight sea mayor a 0
     age: int = Field(..., gt=0)  # Validar que age sea mayor a 0
     image_url: str
-    geender: GenderEnum
+    gender: GenderEnum
 
 class PetSchemaResponse(BaseModel):
     id: int
@@ -23,7 +23,6 @@ class PetSchemaResponse(BaseModel):
     breed: str
     species: str
     weight: float
-    gender: str
     age: int
     image_url: str
-    geender: GenderEnum
+    gender: GenderEnum
