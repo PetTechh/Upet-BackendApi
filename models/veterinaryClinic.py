@@ -9,5 +9,6 @@ class VeterinaryClinic(Base):
     location = Column(String(255))
     services = Column(String(255))
     hours = Column(String(255))
+    image_url = Column(String(255))
 
 

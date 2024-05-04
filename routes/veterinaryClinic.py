@@ -14,7 +14,8 @@ def create_veterinary_clinic(clinic: VeterinaryClinicSchemaPost, db: Session = D
     new_clinic = {"name": clinic.name, 
                   "location": clinic.location, 
                   "services": clinic.services, 
-                  "hours": clinic.hours}
+                  "hours": clinic.hours,
+                  "image_url": clinic.image_url}
     new_clinic = VeterinaryClinic(**new_clinic)
     db.add(new_clinic)
     db.commit()

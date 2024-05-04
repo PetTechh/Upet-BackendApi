@@ -5,6 +5,7 @@ class VeterinaryClinicSchemaPost(BaseModel):
     location: str
     services: str
     hours:str
+    image_url: str
 
 class VeterinaryClinicSchemaGet(BaseModel):
     id: int
@@ -12,3 +13,4 @@ class VeterinaryClinicSchemaGet(BaseModel):
     location: str
     services: str
     hours:str
+    image_url: str
