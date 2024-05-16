@@ -8,3 +8,7 @@ class VeterinarianSchemaGet(BaseModel):
     userId: int
     clinicId :int
 
+class VeterinarianSchemaGetByID(BaseModel):
+    id: int
+    name: str
+    clinicId :int

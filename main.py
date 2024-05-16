@@ -11,12 +11,11 @@ from routes.veterinarian import veterinarians as veterinarian_router
 from routes.disease import diseases as disease_router
 from routes.vaccination import vaccinations as vaccine_router
 from auth.routes.auth import auth as auth_router
-
+from config.routes import prefix
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-prefix = "/api/v1"
 
 app.include_router(auth_router,  prefix= prefix)
 app.include_router(user_router, prefix= prefix)

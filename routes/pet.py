@@ -17,9 +17,7 @@ def create_pet(petowner_id: int, pet: PetSchemaPost, db: Session = Depends(get_d
     if not pet_owner:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El propietario de la mascota no existe.")
     
-    if pet.age <= 0:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La edad debe ser mayor a 0.")
-    
+
     if pet.weight <= 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El peso debe ser mayor a 0.")
     
@@ -39,6 +37,5 @@ def get_pets_by_owner(petowner_id: int, db: Session = Depends(get_db)):
     pet_owner = db.query(PetOwner).filter(PetOwner.id == petowner_id).first()
     if not pet_owner:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El propietario de la mascota no existe.")
-
     pets = db.query(Pet).filter(Pet.petOwnerId == petowner_id).all()
     return pets

@@ -20,3 +20,9 @@ class UserSchemaPost(BaseModel):
     password: str
     userType: UserType
 
+class UserSchemaResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    userType: UserType
+    registered: bool

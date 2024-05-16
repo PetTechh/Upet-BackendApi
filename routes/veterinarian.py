@@ -1,49 +1,41 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from config.db import get_db
 
-from routes.user import endpoint as user_endpoint
 
 from models.user import User
 from models.veterinarian import Veterinarian
 from models.veterinaryClinic import VeterinaryClinic
+from schemas.veterinarian import VeterinarianSchemaPost, VeterinarianSchemaGet, VeterinarianSchemaGetByID
 
 from schemas.veterinarian import VeterinarianSchemaGet, VeterinarianSchemaPost
 
 from sqlalchemy.orm import Session
-
+from services.veterinarianService import VeterinarianService
 veterinarians = APIRouter()
 tag = "Veterinarians"
 
 
-endpoint = user_endpoint + "/veterinarians"
+endpoint =  "/veterinarians"
 
 @veterinarians.post( endpoint + "/{user_id}", response_model=VeterinarianSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_veterinarian(user_id: int, veterinarian: VeterinarianSchemaPost, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El usuario no existe o no es un veterinario no registrado.")
-    
-    # Verificar que el userType sea Vet
-    if user.userType != "Vet":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario no es un veterinario.")
+    return VeterinarianService.create_new_veterinarian(user_id, veterinarian, db)
 
-    if user.registered== True:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario ya ha sido registrado")
-
-    new_veterinarian = Veterinarian(userId=user_id, clinicId=veterinarian.clinicId)
-    
-    clinic = db.query(VeterinaryClinic).filter(VeterinaryClinic.id == veterinarian.clinicId).first()
-    
-    if not clinic:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La clínica no existe.")
-    
-    db.add(new_veterinarian)
-    user.registered = True
-    db.commit()
-    return new_veterinarian
 
 
 
 @veterinarians.get(endpoint, response_model=list[VeterinarianSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_veterinarians(db: Session = Depends(get_db)):
-    return db.query(Veterinarian).all()
+    return VeterinarianService.get_veterinarians(db)
+
+@veterinarians.get(endpoint + "/users/{user_id}", response_model=VeterinarianSchemaGet, tags=[tag])
+def get_veterinarian_by_user_id(user_id: int, db: Session = Depends(get_db)):
+    veterinarian = VeterinarianService.get_veterinarian_by_user_id(user_id, db)
+    if not veterinarian:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Veterinarian not found")
+    return veterinarian
+
+@veterinarians.get(endpoint + "{vet_id}", response_model=VeterinarianSchemaGetByID, tags=[tag])
+def get_veterinarian_by_id(vet_id: int, db: Session = Depends(get_db)):
+    veterinarian = VeterinarianService.get_veterinarian_by_id(vet_id, db)
+    return veterinarian
