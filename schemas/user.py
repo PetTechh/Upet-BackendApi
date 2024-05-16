@@ -1,9 +1,7 @@
 from pydantic import BaseModel
-from enum import Enum
+from Enums.userTypeEnum import UserType
 
-class UserType(str, Enum):
-    Vet = "Vet"
-    Owner = "Owner"
+
 
 class UserSchemaGet(BaseModel):
     id: int

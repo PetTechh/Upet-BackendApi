@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, Integer, String, Enum
 from config.db import Base
-
+from Enums.userTypeEnum import UserType
 class User(Base):
     __tablename__ = 'users'
 
@@ -8,5 +8,5 @@ class User(Base):
     name = Column(String(155))
     email = Column(String(155), unique=True, index=True)
     password = Column(String(155))
-    userType = Column(Enum('Vet', 'Owner', name='user_type'))
+    userType = Column(Enum(UserType, name='user_type'))
     registered = Column(Boolean, default=False)  

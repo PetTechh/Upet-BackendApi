@@ -1,21 +1,9 @@
 from pydantic import BaseModel, Field
 from enum import Enum
 from datetime import date
+from Enums.speciesEnum import SpecieEnum
+from Enums.genderEnum import GenderEnum
 
-
-class GenderEnum(str, Enum):
-    Male = "Male",
-    Female = "Female"
-
-class SpecieEnum(str, Enum):
-    Dog = "Dog",
-    Cat = "Cat",
-    Bird = "Bird",
-    Fish = "Fish",
-    Reptile = "Reptile",
-    Rodent = "Rodent",
-    Rabbit = "Rabbit",
-    Other = "Other"
 
 class PetSchemaPost(BaseModel):
     name: str
