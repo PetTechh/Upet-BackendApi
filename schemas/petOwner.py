@@ -14,4 +14,10 @@ class PetOwnerSchemaGet(BaseModel):
     userId: int
     numberPhone: str
     subscriptionType: SubscriptionType
+
+class PetOwnerSchemaGetByID(BaseModel):
+    id: int
+    name: str
+    numberPhone: str
+    subscriptionType: SubscriptionType
     
