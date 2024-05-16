@@ -1,10 +1,6 @@
 from pydantic import BaseModel, Field
-from enum import Enum
+from Enums.subscriptionTypeEnum import SubscriptionType
 
-class SubscriptionType(str, Enum):
-    Basic = "Basic"
-    Advanced = "Advanced"
-    Pro = "Pro"
 
 class PetOwnerSchemaPost(BaseModel):
     numberPhone: str
