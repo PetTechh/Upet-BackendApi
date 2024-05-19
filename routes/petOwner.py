@@ -30,7 +30,7 @@ def get_petowner_by_user_id(user_id: int, db: Session = Depends(get_db)):
     return pet_owner
 
 @pet_owners.get(endpoint + "/{petOwner_id}", response_model=PetOwnerSchemaGetByID, tags=[tag])
-def get_petowner_by_id(petOwner_id: int, db: Session = Depends(get_db)):
+def get_by_id(petOwner_id: int, db: Session = Depends(get_db)):
     pet_owner = PetOwnerService.get_petOwner_by_id(petOwner_id, db)
     return pet_owner
 

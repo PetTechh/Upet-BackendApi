@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 
 class VeterinarianSchemaPost(BaseModel):
-    clinicId :int
+    clinicName: str
+    otp_password: str
     
 class VeterinarianSchemaGet(BaseModel):
     id: int
@@ -12,3 +13,4 @@ class VeterinarianSchemaGetByID(BaseModel):
     id: int
     name: str
     clinicId :int
+    image_url: str

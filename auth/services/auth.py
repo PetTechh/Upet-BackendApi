@@ -9,7 +9,7 @@ from passlib.hash import bcrypt as bcrypt_context
 from typing import Annotated
 from ..config.auth import SECRET_KEY, ALGORITHM, token_url
 from schemas.user import UserType
-from auth.schemas.auth import CreateUserRequest
+from auth.schemas.auth import CreateUserRequest, UserSchemaPost
 from auth.schemas.auth import  Token, UserSchemaResponse
 from sqlalchemy.orm import Session
 from services.veterinarianService import VeterinarianService
@@ -19,7 +19,7 @@ oauth2_bearer = OAuth2PasswordBearer(tokenUrl=token_url)
 
 class AuthServices:
     @staticmethod
-    def authenticate_user( email: str, password: str, db: Session):
+    def authenticate_user(email: str, password: str, db: Session):
         user = db.query(User).filter(User.email == email).first()
         if not user:
             return False
@@ -52,8 +52,8 @@ class AuthServices:
         except JWTError:
             raise credentials_exception
         
-
-    async def sign_up(self, create_user_request: CreateUserRequest, db: Session):
+    @staticmethod
+    async def sign_up(create_user_request: UserSchemaResponse, db: Session):
         existing_user = db.query(User).filter(User.email == create_user_request.email).first()
         if existing_user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email registered. Please use another email or sign in if you already have an account.")
@@ -86,10 +86,13 @@ class AuthServices:
             
         user_response = UserSchemaResponse(id=user.id, email=user.email, userType=user.userType, registered=user.registered, name=user.name)
 
-        if user_response.userType == UserType.Vet:
-            role_id = VeterinarianService.get_veterinarian_by_user_id(user_response.id, db).id
-        elif user_response.userType == UserType.Owner:
-            role_id = PetOwnerService.get_petowner_by_user_id(user_response.id, db).id
+        if user_response.registered == True:
+            if user_response.userType == UserType.Vet:
+                role_id = VeterinarianService.get_veterinarian_by_user_id(user_response.id, db).id
+            elif user_response.userType == UserType.Owner:
+                role_id = PetOwnerService.get_petowner_by_user_id(user_response.id, db).id
+        else:
+            role_id = user_response.id
 
         token = AuthServices.create_access_token(user_response.email, role_id, user_response.userType, timedelta(hours=1))
 

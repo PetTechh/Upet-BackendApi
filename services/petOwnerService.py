@@ -49,5 +49,10 @@ class PetOwnerService:
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-        return PetOwnerSchemaGetByID(id=petOwner.id, userId=petOwner.userId, name=user.name, numberPhone=petOwner.numberPhone, subscriptionType=petOwner.subscriptionType)
+        return PetOwnerSchemaGetByID(id=petOwner.id, 
+                                     userId=petOwner.userId, 
+                                     name=user.name, 
+                                     image_url=user.image_url,
+                                     numberPhone=petOwner.numberPhone, 
+                                     subscriptionType=petOwner.subscriptionType)
     

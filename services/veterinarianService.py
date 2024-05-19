@@ -9,22 +9,26 @@ from typing import List
 from services.userService import UserService
 from auth.schemas.auth import UserType
 from schemas.veterinarian import VeterinarianSchemaGetByID
+from services.veterinaryClinicService import VeterinaryClinicService
 class VeterinarianService:
+
+
     @staticmethod
-    def create_new_veterinarian(user_id: int, veterinarian: VeterinarianSchemaPost, db: Session = Depends(get_db)):
+    def create_new_veterinarian(user_id: int, veterinarian: VeterinarianSchemaPost, db: Session):
         user = UserService.get_user_by_id(user_id, db)
-        # Verificar que el userType sea Vet
         if user.userType != UserType.Vet:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario no es un veterinario.")
 
-        if user.registered== True:
+        if user.registered == True:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario ya ha sido registrado")
 
-        clinic = db.query(VeterinaryClinic).filter(VeterinaryClinic.id == veterinarian.clinicId).first()
-        if not clinic:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La clínica no existe.")
+        # Verificar OTP y obtener el clinicId
+        clinic_id = VeterinaryClinicService.verify_veterinarian_register(clinic_name=veterinarian.clinicName, 
+                                                                         otp_password=veterinarian.otp_password,
+                                                                         db=db)
 
-        new_veterinarian = Veterinarian(userId=user_id, clinicId=veterinarian.clinicId)
+        new_veterinarian = Veterinarian(userId=user_id, clinicId=clinic_id)
+    
         db.add(new_veterinarian)
         user.registered = True
         db.commit()
@@ -49,4 +53,7 @@ class VeterinarianService:
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-        return VeterinarianSchemaGetByID(id=veterinarian.id, name=user.name, clinicId=veterinarian.clinicId)
+        return VeterinarianSchemaGetByID(id=veterinarian.id, 
+                                         name=user.name,
+                                         image_url=user.image_url,
+                                         clinicId=veterinarian.clinicId)

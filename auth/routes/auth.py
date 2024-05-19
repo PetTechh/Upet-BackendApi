@@ -14,18 +14,16 @@ from ..config.auth import token_endpoint, tag, endpoint
 from auth.schemas.auth import CreateUserRequest
 auth = APIRouter()
 
-auth_services = AuthServices()
 
 @auth.post(endpoint + '/sign-up', status_code=status.HTTP_201_CREATED, tags=[tag])
-async def sign_up(create_user_request: UserSchemaPost, db: Session= Depends(get_db)):
-    new_user = await AuthServices.sign_up(create_user_request, db)
+async def sign_up(create_user_request: UserSchemaPost, db: Session = Depends(get_db)):
+    new_user = await AuthServices.sign_up(create_user_request = create_user_request, db=db)
     return new_user
-
 
 
 @auth.post(token_endpoint, status_code=status.HTTP_200_OK, response_model=Token, tags=[tag])
 async def sign_in(create_user_request: CreateUserRequest, db: Session = Depends(get_db)):
-    token = await AuthServices.sign_in(create_user_request, db)
+    token = await AuthServices.sign_in(create_user_request = create_user_request , db=db)
     return token
 
 #user_dependency = Annotated[dict, Depends(auth_services.get_current_user)]

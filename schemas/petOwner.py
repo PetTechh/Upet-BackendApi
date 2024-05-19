@@ -15,5 +15,6 @@ class PetOwnerSchemaGetByID(BaseModel):
     id: int
     name: str
     numberPhone: str
+    image_url: str
     subscriptionType: SubscriptionType
     
