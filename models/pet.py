@@ -11,6 +11,6 @@ class Pet(Base):
     species = Column(Enum(SpecieEnum,name='species_enum'), nullable=False)
     weight = Column(DECIMAL)
     birthdate = Column(Date)
-    image_url = Column(String(255))
+    image_url = Column(String(255), default="https://image.freepik.com/vector-gratis/ilustracion-vector-dibujos-animados-lindo-animal-mascota_24640-53565.jpg")
     gender = Column(Enum(GenderEnum, name='gender'), nullable=False)
 

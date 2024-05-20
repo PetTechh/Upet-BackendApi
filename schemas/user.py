@@ -7,8 +7,8 @@ class UserSchemaGet(BaseModel):
     id: int
     name: str
     email: str
-    password: str
     userType: UserType
+    image_url: str
     registered: bool  # Agregar el campo registrado
 
 
