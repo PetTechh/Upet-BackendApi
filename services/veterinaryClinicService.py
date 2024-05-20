@@ -20,7 +20,7 @@ class VeterinaryClinicService:
         return new_clinic
 
     @staticmethod
-    def get_veterinary_clinics(db: Session):
+    def get_veterinary_clinics(db: Session) -> list[VeterinaryClinicSchemaGet]:
         return db.query(VeterinaryClinic).all()
     
     @staticmethod

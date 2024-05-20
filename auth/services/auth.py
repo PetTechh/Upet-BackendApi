@@ -14,6 +14,7 @@ from auth.schemas.auth import  Token, UserSchemaResponse
 from sqlalchemy.orm import Session
 from services.veterinarianService import VeterinarianService
 from services.petOwnerService import PetOwnerService
+from auth.services.token import TokenServices
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl=token_url)
 
@@ -28,13 +29,6 @@ class AuthServices:
         
         return user
 
-    @staticmethod
-    def create_access_token( email : str, user_id: int, user_role: UserType , expires_delta: timedelta):
-        to_encode = {"sub": email, "user_id": user_id, "user_role": user_role}
-        expire = datetime.utcnow() + expires_delta
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-        return encoded_jwt
 
     async def get_current_user(self, token: Annotated[str,Depends(oauth2_bearer)]):
         credentials_exception = HTTPException(
@@ -53,7 +47,7 @@ class AuthServices:
             raise credentials_exception
         
     @staticmethod
-    async def sign_up(create_user_request: UserSchemaResponse, db: Session):
+    async def sign_up(create_user_request: UserSchemaPost, db: Session):
         existing_user = db.query(User).filter(User.email == create_user_request.email).first()
         if existing_user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email registered. Please use another email or sign in if you already have an account.")
@@ -72,8 +66,10 @@ class AuthServices:
         db.commit()
         db.refresh(new_user)  # Refresh the user to get the updated data from the database
 
-        return new_user
+        token = TokenServices.create_access_token(new_user.email, new_user.id, new_user.userType, timedelta(hours=1))
 
+        return Token(access_token=token, token_type="bearer")
+    
     @staticmethod
     async def sign_in(create_user_request: CreateUserRequest, db: Session):
         user = AuthServices.authenticate_user(create_user_request.email, create_user_request.password, db)
@@ -94,6 +90,6 @@ class AuthServices:
         else:
             role_id = user_response.id
 
-        token = AuthServices.create_access_token(user_response.email, role_id, user_response.userType, timedelta(hours=1))
+        token = TokenServices.create_access_token(user_response.email, role_id, user_response.userType, timedelta(hours=1))
 
         return Token(access_token=token, token_type="bearer")

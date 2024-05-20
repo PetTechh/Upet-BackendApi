@@ -1,9 +1,6 @@
-from fastapi import Depends, HTTPException, status
-from config.db import get_db
-from routes.user import endpoint as user_endpoint
+from fastapi import HTTPException, status
 from models.user import User
-from models.petOwner import PetOwner
-from schemas.petOwner import PetOwnerSchemaPost, SubscriptionType
+
 from sqlalchemy.orm import Session
 from auth.schemas.auth import UserType
 

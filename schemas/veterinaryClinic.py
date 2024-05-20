@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class VeterinaryClinicSchemaPost(BaseModel):
     name: str
     location: str
@@ -13,3 +14,4 @@ class VeterinaryClinicSchemaGet(BaseModel):
     services: str
     office_hours: str
     image_url: str
+

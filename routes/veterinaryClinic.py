@@ -6,7 +6,7 @@ from models.veterinaryClinic import VeterinaryClinic
 from services.veterinaryClinicService import VeterinaryClinicService
 from config.db import get_db
 from fastapi import Depends
-
+from schemas.veterinarian import VeterinarianSchemaGet
 veterinary_clinics = APIRouter()
 tag = "Veterinary Clinics"
 endpoint = "/veterinary_clinics"

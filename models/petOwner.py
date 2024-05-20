@@ -1,12 +1,14 @@
 from sqlalchemy import Column, Integer, String, Enum
-from config.db import Base, engine
+from config.db import Base
 from Enums.subscriptionTypeEnum import SubscriptionType
+from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey
 
 class PetOwner(Base):
     __tablename__ = 'petowners'
     id = Column(Integer, primary_key=True, index=True)
-    userId = Column(Integer)
+    userId = Column(Integer, ForeignKey('users.id'))
     numberPhone = Column(String(10))
     subscriptionType = Column(Enum(SubscriptionType, name='subscription_type'), default=SubscriptionType.Basic)
-    
 
+    user = relationship("User", back_populates="pet_owner")

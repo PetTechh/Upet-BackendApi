@@ -15,7 +15,7 @@ from auth.schemas.auth import CreateUserRequest
 auth = APIRouter()
 
 
-@auth.post(endpoint + '/sign-up', status_code=status.HTTP_201_CREATED, tags=[tag])
+@auth.post(endpoint + '/sign-up', status_code=status.HTTP_201_CREATED,  response_model= Token, tags=[tag])
 async def sign_up(create_user_request: UserSchemaPost, db: Session = Depends(get_db)):
     new_user = await AuthServices.sign_up(create_user_request = create_user_request, db=db)
     return new_user
