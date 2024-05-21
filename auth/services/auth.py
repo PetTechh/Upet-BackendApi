@@ -66,7 +66,7 @@ class AuthServices:
         db.commit()
         db.refresh(new_user)  # Refresh the user to get the updated data from the database
 
-        token = TokenServices.create_access_token(new_user.email, new_user.id, new_user.userType, timedelta(hours=1))
+        token = TokenServices.create_access_token(new_user.email, new_user.id, new_user.userType, new_user.registered, timedelta(hours=1))
 
         return Token(access_token=token, token_type="bearer")
     
@@ -90,6 +90,6 @@ class AuthServices:
         else:
             role_id = user_response.id
 
-        token = TokenServices.create_access_token(user_response.email, role_id, user_response.userType, timedelta(hours=1))
+        token = TokenServices.create_access_token(user_response.email, role_id, user_response.userType, user_response.registered, timedelta(hours=1))
 
         return Token(access_token=token, token_type="bearer")

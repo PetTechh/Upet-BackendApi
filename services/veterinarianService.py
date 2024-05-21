@@ -37,7 +37,7 @@ class VeterinarianService:
         user.registered = True
         db.commit()
         
-        token = TokenServices.create_access_token(user.email, new_veterinarian.id, user.userType, timedelta(hours=1))
+        token = TokenServices.create_access_token(user.email, new_veterinarian.id, user.userType, user.registered,timedelta(hours=1))
 
         return Token(access_token=token, token_type="bearer")
 
