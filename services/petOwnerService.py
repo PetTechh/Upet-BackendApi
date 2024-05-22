@@ -30,7 +30,10 @@ class PetOwnerService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El número de teléfono debe tener 10 dígitos.")
 
 
-        new_petowner = PetOwner(userId=user_id, numberPhone= petowner.numberPhone , subscriptionType=SubscriptionType.Basic)
+        new_petowner = PetOwner(userId=user_id,
+                                 numberPhone= petowner.numberPhone,
+                                 location = petowner.location,
+                                   subscriptionType=SubscriptionType.Basic)
         db.add(new_petowner)
         user.registered = True
         db.commit()
