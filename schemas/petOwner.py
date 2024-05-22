@@ -5,6 +5,7 @@ from models.user import User
 
 class PetOwnerSchemaPost(BaseModel):
     numberPhone: str
+    location: str
 
 
 class PetOwnerSchemaGet(BaseModel):
@@ -12,6 +13,7 @@ class PetOwnerSchemaGet(BaseModel):
     name: str
     numberPhone: str
     image_url: str
+    location: str
     subscriptionType: SubscriptionType
     
     class Config:
@@ -23,6 +25,7 @@ class PetOwnerSchemaGet(BaseModel):
             id=petOwner.id,
             name=user.name,
             numberPhone=petOwner.numberPhone,
+            location=petOwner.location,
             image_url=user.image_url,
             subscriptionType=petOwner.subscriptionType
         )
