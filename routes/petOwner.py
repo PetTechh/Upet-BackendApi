@@ -12,7 +12,7 @@ from services.petOwnerService import PetOwnerService
 from auth.schemas.auth import Token
 pet_owners = APIRouter()
 tag = "Pet Owners"
-endpoint = "/petowner"
+endpoint = "/petowners"
 
 @pet_owners.post(endpoint +"/{user_id}", response_model=Token, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_petowner(user_id: int, petowner: PetOwnerSchemaPost, db: Session = Depends(get_db)):
