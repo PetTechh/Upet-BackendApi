@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, DECIMAL, ForeignKey, Enum, Date
 from config.db import Base, engine
 from Enums.speciesEnum import SpecieEnum
 from Enums.genderEnum import GenderEnum
+from sqlalchemy.orm import relationship
 class Pet(Base):
     __tablename__ = 'pets'
     id = Column(Integer, primary_key=True, index=True)
@@ -14,3 +15,4 @@ class Pet(Base):
     image_url = Column(String(255), default="https://image.freepik.com/vector-gratis/ilustracion-vector-dibujos-animados-lindo-animal-mascota_24640-53565.jpg")
     gender = Column(Enum(GenderEnum, name='gender'), nullable=False)
 
+    pet_owner = relationship("PetOwner", back_populates="pets")
