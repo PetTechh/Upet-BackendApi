@@ -13,3 +13,4 @@ class PetOwner(Base):
     subscriptionType = Column(Enum(SubscriptionType, name='subscription_type'), default=SubscriptionType.Basic)
 
     user = relationship("User", back_populates="pet_owner")
+    pets = relationship("Pet", back_populates="pet_owner", cascade="all, delete-orphan")
