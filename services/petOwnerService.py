@@ -7,7 +7,7 @@ from schemas.petOwner import PetOwnerSchemaPost, SubscriptionType
 from sqlalchemy.orm import Session
 from auth.schemas.auth import UserType
 from services.userService import UserService
-from schemas.petOwner import PetOwnerSchemaGet
+from schemas.petOwner import PetOwnerSchemaGet, PetOwnerUpdateInformation
 from auth.services.token import TokenServices
 from auth.schemas.auth import Token
 from datetime import timedelta
@@ -83,3 +83,14 @@ class PetOwnerService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         return PetOwnerSchemaGet.from_orm(petOwner, user)
+    
+    @staticmethod
+    def change_Datapetowner(petowner_id: int, petowner: PetOwnerUpdateInformation, db: Session):
+        petOwner_db = db.query(PetOwner).filter(PetOwner.id == petowner_id).first()
+        if not petOwner_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="PetOwner not found")
+  
+        PetOwnerSchemaGet.update_information(petOwner_db, petowner)
+        db.commit()
+        db.refresh(petOwner_db)
+        return PetOwnerSchemaGet.from_orm(petOwner_db, petOwner_db.user)
