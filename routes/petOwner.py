@@ -4,7 +4,7 @@ from config.db import get_db
 from routes.user import endpoint 
 from fastapi import HTTPException
 
-from schemas.petOwner import PetOwnerSchemaGet, PetOwnerSchemaPost
+from schemas.petOwner import PetOwnerSchemaGet, PetOwnerSchemaPost, PetOwnerUpdateInformation
 
 from sqlalchemy.orm import Session
 from services.petOwnerService import PetOwnerService
@@ -35,3 +35,6 @@ def get_by_id(petOwner_id: int, db: Session = Depends(get_db)):
     pet_owner = PetOwnerService.get_petOwner_by_id(petOwner_id, db)
     return pet_owner
 
+@pet_owners.put(endpoint + "/{petOwner_id}", response_model=PetOwnerSchemaGet, tags=[tag])
+def change_petOwner(petOwner_id: int, petOwner: PetOwnerUpdateInformation, db: Session = Depends(get_db)):
+    return PetOwnerService.change_Datapetowner(petOwner_id, petOwner, db)

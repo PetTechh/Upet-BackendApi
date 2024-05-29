@@ -18,4 +18,6 @@ class UserSchemaPost(BaseModel):
     password: str
     userType: UserType
 
-
+class UserChangeImage(BaseModel):
+    image_url: str
+    role: UserType
