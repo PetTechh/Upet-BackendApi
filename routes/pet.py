@@ -29,6 +29,10 @@ def get_pets_by_owner(petowner_id: int, db: Session = Depends(get_db)):
 def update_pet(pet_id: int, pet: PetSchemaPost, db: Session = Depends(get_db)):
     return PetServices.update_pet(pet_id, pet, db)
 
+@pets.get(endpoint + "/pet/{pet_id}", response_model=PetSchemaResponse, status_code=status.HTTP_200_OK, tags=[tag])
+def get_pet_by_id(pet_id: int, db: Session = Depends(get_db)):
+    return PetServices.get_pet_by_id(pet_id, db)
+
 @pets.delete( endpoint + "/{pet_id}", response_model=PetSchemaResponse, status_code=status.HTTP_200_OK, tags=[tag])
 def delete_pet(pet_id: int, db: Session = Depends(get_db)):
     return PetServices.delete_pet(pet_id, db)

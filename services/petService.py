@@ -60,6 +60,13 @@ class PetServices:
         return pet_db
     
     @staticmethod
+    def get_pet_by_id(pet_id: int, db: Session):
+        pet = db.query(Pet).filter(Pet.id == pet_id).first()
+        if not pet:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pet not found")
+        return pet
+    
+    @staticmethod
     def delete_pet(pet_id: int, db: Session):
         pet = db.query(Pet).filter(Pet.id == pet_id).first()
         if not pet:
@@ -67,4 +74,5 @@ class PetServices:
         db.delete(pet)
         db.commit()
         return pet
+       
        
