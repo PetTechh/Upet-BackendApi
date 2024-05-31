@@ -23,3 +23,8 @@ def get_veterinary_clinics(db: Session = Depends(get_db)):
 @veterinary_clinics.get(endpoint + "/generate_password/{clinic_id}", status_code=status.HTTP_200_OK, tags=[tag])
 def generate_unique_password(clinic_id: int, db: Session = Depends(get_db)):
     return VeterinaryClinicService.generate_unique_password(clinic_id, db)
+
+@veterinary_clinics.get(endpoint + "/{clinic_id}", response_model=VeterinaryClinicSchemaGet, status_code=status.HTTP_200_OK, tags=[tag])
+def get_veterinary_clinic_by_id(clinic_id: int, db: Session = Depends(get_db)):
+    return VeterinaryClinicService.get_veterinary_clinic_by_id(clinic_id, db)
+
