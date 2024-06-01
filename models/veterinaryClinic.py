@@ -10,6 +10,7 @@ class VeterinaryClinic(Base):
     services = Column(String(255), default="as")
     office_hours  = Column(String(255), default="as")
     phone_number = Column(String(255))
+    description = Column(String(255))
     image_url = Column(String(255),default="https://previews.123rf.com/images/sonulkaster/sonulkaster1707/sonulkaster170700464/82258505-hospital-de-medicina-veterinaria-clínica-o-tienda-de-animales-para-animales-.jpg")
 
 
