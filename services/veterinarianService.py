@@ -42,12 +42,12 @@ class VeterinarianService:
         return Token(access_token=token, token_type="bearer")
 
     @staticmethod
-    def get_veterinarians(db: Session = Depends(get_db)) -> List[VeterinarianSchemaGet]:
+    def get_all_vets(db: Session = Depends(get_db)) -> List[VeterinarianSchemaGet]:
         vets = db.query(Veterinarian).options(joinedload(Veterinarian.user)).all()
         return [VeterinarianSchemaGet.from_orm(vet, vet.user) for vet in vets]
 
     @staticmethod
-    def get_veterinarian_by_user_id(user_id: int, db: Session) -> VeterinarianSchemaGet:
+    def get_vet_by_user_id(user_id: int, db: Session) -> VeterinarianSchemaGet:
         veterinarian = (
             db.query(Veterinarian)
             .filter(Veterinarian.userId == user_id)
@@ -65,7 +65,7 @@ class VeterinarianService:
         return VeterinarianSchemaGet.from_orm(veterinarian, user)
 
     @staticmethod
-    def get_veterinarian_by_id(vet_id: int, db: Session) -> VeterinarianSchemaGet:
+    def get_vet_by_id(vet_id: int, db: Session) -> VeterinarianSchemaGet:
         veterinarian = (
             db.query(Veterinarian)
             .filter(Veterinarian.id == vet_id)
@@ -81,3 +81,8 @@ class VeterinarianService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         return VeterinarianSchemaGet.from_orm(veterinarian, user)
+    
+    @staticmethod
+    def get_vets_by_clinic_id(clinic_id: int, db: Session) -> List[VeterinarianSchemaGet]:
+        vets = db.query(Veterinarian).filter(Veterinarian.clinicId == clinic_id).options(joinedload(Veterinarian.user)).all()
+        return [VeterinarianSchemaGet.from_orm(vet, vet.user) for vet in vets]

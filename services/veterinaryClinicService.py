@@ -8,13 +8,9 @@ from services.otpService import OTPServices
 
 class VeterinaryClinicService:
 
-
     @staticmethod
     def create_veterinary_clinic( clinic: VeterinaryClinicSchemaPost, db: Session):
-        new_clinic = VeterinaryClinic(name=clinic.name, 
-                                      location=clinic.location, 
-                                      office_hours=clinic.office_hours,
-                                      phone_number=clinic.phone_number)
+        new_clinic = clinic.to_model() #transform the schema to a model
         db.add(new_clinic)
         db.commit()
         return new_clinic

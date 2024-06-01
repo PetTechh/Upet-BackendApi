@@ -24,16 +24,21 @@ def create_veterinarian(user_id: int, veterinarian: VeterinarianSchemaPost, db: 
 
 @veterinarians.get(endpoint, response_model=list[VeterinarianSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_veterinarians(db: Session = Depends(get_db)):
-    return VeterinarianService.get_veterinarians(db)
+    return VeterinarianService.get_all_vets(db)
 
 @veterinarians.get(endpoint + "/users/{user_id}", response_model=VeterinarianSchemaGet, tags=[tag])
 def get_veterinarian_by_user_id(user_id: int, db: Session = Depends(get_db)):
-    veterinarian = VeterinarianService.get_veterinarian_by_user_id(user_id, db)
+    veterinarian = VeterinarianService.get_vet_by_user_id(user_id, db)
     if not veterinarian:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Veterinarian not found")
     return veterinarian
 
 @veterinarians.get(endpoint + "{vet_id}", response_model=VeterinarianSchemaGet, tags=[tag])
 def get_veterinarian_by_id(vet_id: int, db: Session = Depends(get_db)):
-    veterinarian = VeterinarianService.get_veterinarian_by_id(vet_id, db)
+    veterinarian = VeterinarianService.get_vet_by_id(vet_id, db)
     return veterinarian
+
+@veterinarians.get(endpoint + "/vets/{clinic_id}", response_model=list[VeterinarianSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_vets_by_clinic_id(clinic_id: int, db: Session = Depends(get_db)):
+    return VeterinarianService.get_vets_by_clinic_id(clinic_id, db)
+
