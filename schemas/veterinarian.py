@@ -13,7 +13,7 @@ class VeterinarianSchemaGet(BaseModel):
     name: str
     clinicId :int
     image_url: str
-    userId: int
+    user_id: int
     
     class Config:
         orm_mode = True
@@ -24,6 +24,6 @@ class VeterinarianSchemaGet(BaseModel):
             id=veterinarian.id,
             name=user.name,
             image_url= user.image_url,
-            userId=veterinarian.userId,
-            clinicId=veterinarian.clinicId
+            user_id=veterinarian.user_id,
+            clinicId=veterinarian.clinic_id
         )

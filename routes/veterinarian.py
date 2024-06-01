@@ -19,9 +19,6 @@ endpoint =  "/veterinarians"
 def create_veterinarian(user_id: int, veterinarian: VeterinarianSchemaPost, db: Session = Depends(get_db)):
     return VeterinarianService.create_new_veterinarian(user_id, veterinarian, db)
 
-
-
-
 @veterinarians.get(endpoint, response_model=list[VeterinarianSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_veterinarians(db: Session = Depends(get_db)):
     return VeterinarianService.get_all_vets(db)

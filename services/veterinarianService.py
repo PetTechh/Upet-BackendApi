@@ -31,7 +31,7 @@ class VeterinarianService:
                                                                          otp_password=veterinarian.otp_password,
                                                                          db=db)
 
-        new_veterinarian = Veterinarian(userId=user_id, clinicId=clinic_id)
+        new_veterinarian = Veterinarian(user_id=user_id, clinic_id=clinic_id)
     
         db.add(new_veterinarian)
         user.registered = True
@@ -84,5 +84,5 @@ class VeterinarianService:
     
     @staticmethod
     def get_vets_by_clinic_id(clinic_id: int, db: Session) -> List[VeterinarianSchemaGet]:
-        vets = db.query(Veterinarian).filter(Veterinarian.clinicId == clinic_id).options(joinedload(Veterinarian.user)).all()
+        vets = db.query(Veterinarian).filter(Veterinarian.cl == clinic_id).options(joinedload(Veterinarian.user)).all()
         return [VeterinarianSchemaGet.from_orm(vet, vet.user) for vet in vets]

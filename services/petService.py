@@ -9,6 +9,7 @@ from fastapi import HTTPException, status
 from models.petOwner import PetOwner
 from models.pet import Pet
 from schemas.pet import PetSchemaPost, PetSchemaResponse
+
 class PetServices:
     @staticmethod
     def create_new_pet(petowner_id: int, pet: PetSchemaPost, db: Session = Depends(get_db)):

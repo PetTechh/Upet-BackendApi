@@ -3,6 +3,7 @@ from config.db import Base
 from Enums.subscriptionTypeEnum import SubscriptionType
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey
+from models.user import User  # Importa la clase User desde models.user
 
 class PetOwner(Base):
     __tablename__ = 'petowners'
@@ -14,3 +15,4 @@ class PetOwner(Base):
 
     user = relationship("User", back_populates="pet_owner")
     pets = relationship("Pet", back_populates="pet_owner", cascade="all, delete-orphan")
+from models.pet import Pet  # Importa la clase Pet después de la definición de PetOwner
