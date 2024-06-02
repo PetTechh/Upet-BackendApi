@@ -84,5 +84,5 @@ class VeterinarianService:
     
     @staticmethod
     def get_vets_by_clinic_id(clinic_id: int, db: Session) -> List[VeterinarianSchemaGet]:
-        vets = db.query(Veterinarian).filter(Veterinarian.‎clinic_id‎ == clinic_id).options(joinedload(Veterinarian.user)).all()
+        vets = db.query(Veterinarian).filter(Veterinarian.clinic_id == clinic_id).options(joinedload(Veterinarian.user)).all()
         return [VeterinarianSchemaGet.from_orm(vet, vet.user) for vet in vets]
