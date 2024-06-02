@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy.orm import Session
 
-from schemas.veterinaryClinic import VeterinaryClinicSchemaGet, VeterinaryClinicSchemaPost
+from schemas.availability import AvailabilitySchema
+from schemas.veterinaryClinic import AvailabilitySchemaPost, VeterinaryClinicSchemaGet, VeterinaryClinicSchemaPost
 from models.veterinaryClinic import VeterinaryClinic
 from services.veterinaryClinicService import VeterinaryClinicService
 from config.db import get_db
 from fastapi import Depends
+from datetime import date, datetime
 from schemas.veterinarian import VeterinarianSchemaGet
 veterinary_clinics = APIRouter()
 tag = "Veterinary Clinics"
@@ -28,3 +30,6 @@ def generate_unique_password(clinic_id: int, db: Session = Depends(get_db)):
 def get_veterinary_clinic_by_id(clinic_id: int, db: Session = Depends(get_db)):
     return VeterinaryClinicService.get_veterinary_clinic_by_id(clinic_id, db)
 
+@veterinary_clinics.post(endpoint + "/{clinic_id}/available_times", status_code=status.HTTP_200_OK, tags=[tag])
+def get_available_times(clinic_id: int, day: AvailabilitySchemaPost, db: Session = Depends(get_db)):
+    return VeterinaryClinicService.get_available_times(clinic_id, day.date, db)

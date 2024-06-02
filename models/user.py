@@ -16,3 +16,7 @@ class User(Base):
 
     pet_owner = relationship("PetOwner", back_populates="user")
     veterinarian = relationship("Veterinarian", back_populates="user")
+
+
+
+from models.petOwner import PetOwner  # Importa la clase PetOwner después de la definición de User

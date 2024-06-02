@@ -3,6 +3,8 @@ from config.db import Base, engine
 from Enums.speciesEnum import SpecieEnum
 from Enums.genderEnum import GenderEnum
 from sqlalchemy.orm import relationship
+from models.petOwner import PetOwner
+
 class Pet(Base):
     __tablename__ = 'pets'
     id = Column(Integer, primary_key=True, index=True)
@@ -16,3 +18,5 @@ class Pet(Base):
     gender = Column(Enum(GenderEnum, name='gender'), nullable=False)
 
     pet_owner = relationship("PetOwner", back_populates="pets")
+
+
