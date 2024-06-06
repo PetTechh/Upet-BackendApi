@@ -14,6 +14,8 @@ class Veterinarian(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'))
+    description = Column(String, nullable=True)  # Permitir que la columna sea nula
+    experience = Column(Integer, nullable=True)  # Permitir que la columna sea nula
     clinic_id = Column(Integer, ForeignKey('veterinaryclinics.id'))  # Nueva columna para la relación con VeterinaryClinic
 
     user = relationship("User", back_populates="veterinarian")
