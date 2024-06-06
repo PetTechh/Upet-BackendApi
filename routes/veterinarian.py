@@ -30,7 +30,7 @@ def get_veterinarian_by_user_id(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Veterinarian not found")
     return veterinarian
 
-@veterinarians.get(endpoint + "{vet_id}", response_model=VeterinarianSchemaGet, tags=[tag])
+@veterinarians.get(endpoint + "/{vet_id}", response_model=VeterinarianSchemaGet, tags=[tag])
 def get_veterinarian_by_id(vet_id: int, db: Session = Depends(get_db)):
     veterinarian = VeterinarianService.get_vet_by_id(vet_id, db)
     return veterinarian
