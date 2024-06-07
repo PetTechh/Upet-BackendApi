@@ -1,32 +1,40 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from config.db import get_db
-from models.user import PetOwner
+from models.petOwner import PetOwner
 
-from schemas.pet import PetSchemaPost, PetSchemaGet
+from schemas.pet import PetSchemaPost, PetSchemaResponse
 from models.pet import Pet
-
+from services.petService import PetServices
 pets = APIRouter()
-tag = "pets"
-
-@pets.post("/pets/", response_model=PetSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
-def create_pet(pet: PetSchemaPost, db: Session = Depends(get_db)):
-    pet_owner = db.query(PetOwner).filter(PetOwner.id == pet.petOwnerId).first()
-    if not pet_owner:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El propietario de la mascota no existe.")
-    
-    if pet.age <= 0:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La edad debe ser mayor a 0.")
-    
-    if pet.weight <= 0:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El peso debe ser mayor a 0.")
-    
-    new_pet = Pet(**pet.dict())
-    db.add(new_pet)
-    db.commit()
-    return new_pet
+tag = "Pets"
+endpoint = "/pets"
 
 
-@pets.get("/pets/", response_model=list[PetSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+@pets.post( endpoint + "/{petowner_id}", response_model=PetSchemaResponse, status_code=status.HTTP_201_CREATED, tags=[tag])
+def create_pet(petowner_id: int, pet: PetSchemaPost, db: Session = Depends(get_db)):
+    return PetServices.create_new_pet(petowner_id, pet, db)
+
+
+@pets.get( endpoint, response_model=list[PetSchemaResponse], status_code=status.HTTP_200_OK, tags=[tag])
 def get_pets(db: Session = Depends(get_db)):
-    return db.query(Pet).all()
+    return PetServices.get_petowners(db)
+
+
+@pets.get(  endpoint + "/{petowner_id}", response_model=list[PetSchemaResponse], status_code=status.HTTP_200_OK, tags=[tag])
+def get_pets_by_owner(petowner_id: int, db: Session = Depends(get_db)):
+    return PetServices.get_pets_by_petOwnerid(petowner_id, db)
+
+@pets.put( endpoint + "/{pet_id}", response_model=PetSchemaResponse, status_code=status.HTTP_200_OK, tags=[tag])
+def update_pet(pet_id: int, pet: PetSchemaPost, db: Session = Depends(get_db)):
+    return PetServices.update_pet(pet_id, pet, db)
+
+@pets.get(endpoint + "/pet/{pet_id}", response_model=PetSchemaResponse, status_code=status.HTTP_200_OK, tags=[tag])
+def get_pet_by_id(pet_id: int, db: Session = Depends(get_db)):
+    return PetServices.get_pet_by_id(pet_id, db)
+
+@pets.delete( endpoint + "/{pet_id}", response_model=PetSchemaResponse, status_code=status.HTTP_200_OK, tags=[tag])
+def delete_pet(pet_id: int, db: Session = Depends(get_db)):
+    return PetServices.delete_pet(pet_id, db)
+
+

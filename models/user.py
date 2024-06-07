@@ -1,5 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, String, Enum
-from config.db import Base, engine
+from config.db import Base
+from Enums.userTypeEnum import UserType
+from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = 'users'
@@ -8,21 +10,13 @@ class User(Base):
     name = Column(String(155))
     email = Column(String(155), unique=True, index=True)
     password = Column(String(155))
-    userType = Column(Enum('Vet', 'Owner', name='user_type'))
+    userType = Column(Enum(UserType, name='user_type'))
     registered = Column(Boolean, default=False)  
-    
+    image_url = Column(String(255), default="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png")
 
-class PetOwner(Base):
-    __tablename__ = 'petowners'
-    id = Column(Integer, primary_key=True, index=True)
-    userId = Column(Integer)
-    numberPhone = Column(String(10))
-    subscriptionType = Column(Enum('Basic', 'Advanced', 'Pro', name='subscription_type'), default='Basic')
-    
-class Veterinarian(Base):
-    __tablename__ = 'veterinarians'
-    id = Column(Integer, primary_key=True, index=True)
-    userId = Column(Integer)
-    clinicId = Column(Integer)
+    pet_owner = relationship("PetOwner", back_populates="user")
+    veterinarian = relationship("Veterinarian", back_populates="user")
 
-Base.metadata.create_all(bind=engine)
+
+
+from models.petOwner import PetOwner  # Importa la clase PetOwner después de la definición de User
