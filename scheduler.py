@@ -1,13 +1,18 @@
 from datetime import datetime
-import schedule
-import time
+from django.template import engines
+from sqlalchemy.orm import sessionmaker
 from fastapi import Depends
 from sqlalchemy.orm import Session
+import uvicorn
 from config.db import get_db
 from services.availability import AvailabilityService
+from config.db import SessionLocal
+from services.availability import AvailabilityService
 
-def check_and_reset_availabilities(db: Session = Depends(get_db)):
+
+def check_and_reset_availabilities(db: Session):
     AvailabilityService.delete_weekly_availabilities(db)
-    AvailabilityService.create_weekly_availabilities(db)      
-    schedule.clear()  # Detiene el planificador después de ejecutar la tarea
-  
+    db.close()
+
+db = next(get_db())  # Obtener una sesión de base de datos
+check_and_reset_availabilities(db)

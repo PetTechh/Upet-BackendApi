@@ -7,7 +7,9 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 import uvicorn
 from config.db import SessionLocal, get_db
+from scheduler import check_and_reset_availabilities
 from services.availability import AvailabilityService
+from apscheduler.triggers.cron import CronTrigger
 
 
 from routes.user import users as user_router
@@ -23,8 +25,13 @@ from routes.veterinarian import veterinarians as veterinarian_router
 from routes.disease import diseases as disease_router
 from routes.vaccination import vaccinations as vaccine_router
 from routes.review import reviews as review_router
+from routes.availability import availabilities as availability_router, reset_availabilities
 from auth.routes.auth import auth as auth_router
 from config.routes import prefix
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.date import DateTrigger
+
+from scheduler import check_and_reset_availabilities
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -42,38 +49,24 @@ app.include_router(veterinarian_router, prefix= prefix)
 app.include_router(disease_router, prefix= prefix)
 app.include_router(vaccine_router,  prefix= prefix)
 app.include_router(review_router,  prefix= prefix)
+app.include_router(availability_router,  prefix= prefix)
 
-def get_db_session():
+# Configurar el programador
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+def job_wrapper():
     db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    print("Running job")
+    AvailabilityService.delete_weekly_availabilities(db)
+    AvailabilityService.create_weekly_availabilities(db)
+    db.close()
 
-def check_and_reset_availabilities():
-    db = next(get_db_session())
-    try:
-        print("Checking and resetting availabilities")
-        AvailabilityService.delete_weekly_availabilities(db)
-        AvailabilityService.create_weekly_availabilities(db)
-    finally:
-        db.close()
-    schedule.clear()  # Detiene el planificador después de ejecutar la tarea
 
-def schedule_check_and_reset():
-    schedule.every().day.at("23:28").do(check_and_reset_availabilities)
+# Programar la tarea para que se ejecute hoy a las 15:38
+scheduler.add_job(job_wrapper, trigger=CronTrigger(day_of_week="sun", hour=0, minute=0))
 
-def run_schedule():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-# Inicia la tarea de programación
-schedule_check_and_reset()
-
-# Inicia un hilo para ejecutar el ciclo de programación en segundo plano
-threading.Thread(target=run_schedule, daemon=True).start()
-
-if __name__ == "__main__":
-    # Ejecuta la aplicación FastAPI en el puerto 8000
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info", reload=True)
+# Asegurarse de cerrar el programador al apagar la aplicación
+@app.on_event("shutdown")
+def shutdown_event():
+    scheduler.shutdown()

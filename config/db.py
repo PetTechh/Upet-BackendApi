@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
 
 MYSQL_USER = 'root'
 MYSQL_PASSWORD = 'FfgUEZJRiDPRjPsYHlTaokDXYDAhjuHY'
@@ -22,7 +23,7 @@ Base = declarative_base()
 
 
 
-def get_db():
+def get_db() :
     db = SessionLocal()
     try:
         yield db
