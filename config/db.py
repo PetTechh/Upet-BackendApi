@@ -3,9 +3,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'FfgUEZJRiDPRjPsYHlTaokDXYDAhjuHY'
+MYSQL_PASSWORD = 'KLyzHquSzomBjVXrgjMjutjJqLKqQvgw'
 MYSQL_HOST = 'viaduct.proxy.rlwy.net'
-MYSQL_PORT = '58091'
+MYSQL_PORT = '29253'
 MYSQL_DATABASE = 'railway'
 #mysql://root:wUtLBypWHLWWnRUmdFtmdWszWZYYKoaL@viaduct.proxy.rlwy.net:36102/railway
 #mysql://root:MmeGvXZLtObSxyOWGpsIpnMioRtpOJMl@viaduct.proxy.rlwy.net:37129/railway
