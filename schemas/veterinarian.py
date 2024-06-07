@@ -14,8 +14,8 @@ class VeterinarianSchemaGet(BaseModel):
     name: str
     clinicId :int
     image_url: str
-    description: str
-    experience : int
+    description: Optional[str]
+    experience: Optional[int]
     user_id: int
     
     class Config:

@@ -18,3 +18,4 @@ def create_review(petowner_id: int, review: ReviewSchemaPost, db = Depends(get_d
 @reviews.get(endpoint, response_model=list[ReviewSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_reviews(db = Depends(get_db)):
     return ReviewService.get_all_reviews(db)
+

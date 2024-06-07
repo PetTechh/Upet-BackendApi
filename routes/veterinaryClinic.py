@@ -30,6 +30,3 @@ def generate_unique_password(clinic_id: int, db: Session = Depends(get_db)):
 def get_veterinary_clinic_by_id(clinic_id: int, db: Session = Depends(get_db)):
     return VeterinaryClinicService.get_veterinary_clinic_by_id(clinic_id, db)
 
-@veterinary_clinics.post(endpoint + "/{clinic_id}/available_times", status_code=status.HTTP_200_OK, tags=[tag])
-def get_available_times(clinic_id: int, day: AvailabilitySchemaPost, db: Session = Depends(get_db)):
-    return VeterinaryClinicService.get_available_times(clinic_id, day.date, db)
