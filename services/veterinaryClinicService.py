@@ -58,39 +58,3 @@ class VeterinaryClinicService:
         clinic = db.query(VeterinaryClinic).filter(VeterinaryClinic.id == clinic_id).first()
         return clinic
 
-    @staticmethod
-    def get_available_times(clinic_id: int, day: date, db: Session):
-        clinic = db.query(VeterinaryClinic).filter(VeterinaryClinic.id == clinic_id).one_or_none()
-
-        if not clinic:
-            raise HTTPException(status_code=404, detail="Clinic not found")
-        
-        available_times = []
-
-        availabilities = db.query(Availability).join(Veterinarian).filter(
-            Veterinarian.clinic_id == clinic_id,
-            Availability.date == day,
-            Availability.is_available == True
-        ).all()
-
-        for availability in availabilities:
-            current_time = datetime.combine(day, availability.start_time)
-            end_time = datetime.combine(day, availability.end_time)
-            delta = timedelta(minutes=30)
-            while current_time + delta <= end_time:
-                overlapping_appointments = db.query(Appointment).filter(
-                    Appointment.veterinarian_id == availability.veterinarian_id,
-                    Appointment.date_day == day,
-                    Appointment.start_time <= current_time.strftime("%H:%M:%S"),
-                    Appointment.end_time > current_time.strftime("%H:%M:%S")
-                ).count()
-
-                if overlapping_appointments == 0:
-                    available_times.append(current_time.time())
-
-                current_time += delta
-
-        return {
-            "date": day.strftime("%Y-%m-%d"),
-            "available_times": available_times
-        }

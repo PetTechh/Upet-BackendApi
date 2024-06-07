@@ -1,19 +1,29 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from config.db import get_db
-from models.user import User
+from sqlalchemy.orm import joinedload
+
+from models.appointment import Appointment
+from models.availability import Availability
 from models.veterinarian import Veterinarian
-from schemas.veterinarian import VeterinarianSchemaPost, VeterinarianSchemaGet
+
+from schemas.veterinarian import VeterinarianProfileSchemaGet, VeterinarianSchemaPost, VeterinarianSchemaGet
 from typing import List
+
+from services.reviewService import ReviewService
 from services.userService import UserService
+
 from auth.schemas.auth import UserType
+
 from schemas.veterinarian import VeterinarianSchemaGet
 from services.veterinaryClinicService import VeterinaryClinicService
-from sqlalchemy.orm import joinedload
+from services.availability import AvailabilityService
 from auth.services.token import TokenServices
 from auth.schemas.auth import Token
-from datetime import timedelta
+from datetime import date, datetime, timedelta
+from sqlalchemy.orm.exc import NoResultFound
 
+from models.review import Review
 
 class VeterinarianService:
 
@@ -36,7 +46,9 @@ class VeterinarianService:
         db.add(new_veterinarian)
         user.registered = True
         db.commit()
+
         
+        AvailabilityService.create_weekly_availabilities_for_veterinarian(new_veterinarian, db)
         token = TokenServices.create_access_token(user.email, new_veterinarian.id, user.userType, user.registered,timedelta(hours=1))
 
         return Token(access_token=token, token_type="bearer")
@@ -83,6 +95,65 @@ class VeterinarianService:
         return VeterinarianSchemaGet.from_orm(veterinarian, user)
     
     @staticmethod
+    def get_vet_by_id_details(vet_id: int, db: Session) -> VeterinarianProfileSchemaGet:
+        try:
+            veterinarian = (
+                db.query(Veterinarian)
+                .filter(Veterinarian.id == vet_id)
+                .options(
+                    joinedload(Veterinarian.clinic),
+                    joinedload(Veterinarian.user)
+                )
+                .one()  
+            )
+        except NoResultFound:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Veterinarian not found")
+        
+        reviews = ReviewService.get_reviews_by_veterinarian_id(vet_id, db)
+            
+
+        return VeterinarianProfileSchemaGet.from_orm(veterinarian, reviews)
+
+
+
+    @staticmethod
     def get_vets_by_clinic_id(clinic_id: int, db: Session) -> List[VeterinarianSchemaGet]:
         vets = db.query(Veterinarian).filter(Veterinarian.clinic_id == clinic_id).options(joinedload(Veterinarian.user)).all()
         return [VeterinarianSchemaGet.from_orm(vet, vet.user) for vet in vets]
+
+    @staticmethod
+    def get_available_times(vet_id: int, day: date, db: Session):
+        vet = db.query(Veterinarian).filter(Veterinarian.id == vet_id).one_or_none()
+
+        if not vet:
+            raise HTTPException(status_code=404, detail="Veterinarian not found")
+        
+        available_times = []
+
+        availabilities = db.query(Availability).filter(
+            Availability.veterinarian_id == vet_id,
+            Availability.date == day,
+            Availability.is_available == True
+        ).all()
+
+        for availability in availabilities:
+            current_time = datetime.combine(day, availability.start_time)
+            end_time = datetime.combine(day, availability.end_time)
+            delta = timedelta(minutes=30)
+            while current_time + delta <= end_time:
+                overlapping_appointments = db.query(Appointment).filter(
+                    Appointment.veterinarian_id == vet_id,
+                    Appointment.date_day == day,
+                    Appointment.start_time <= current_time.strftime("%H:%M:%S"),
+                    Appointment.end_time > current_time.strftime("%H:%M:%S")
+                ).count()
+
+                if overlapping_appointments == 0:
+                    available_times.append(current_time.time())
+
+                current_time += delta
+
+        return {
+            "date": day.strftime("%Y-%m-%d"),
+            "available_times": available_times
+        }
