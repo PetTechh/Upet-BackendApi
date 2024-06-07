@@ -4,7 +4,7 @@ from config.db import get_db
 
 from schemas.veterinarian import VeterinarianSchemaPost, VeterinarianSchemaGet
 
-from schemas.veterinarian import VeterinarianSchemaGet, VeterinarianSchemaPost
+from schemas.veterinarian import VeterinarianSchemaGet, VeterinarianSchemaPost, VeterinarianProfileSchemaGet
 
 from sqlalchemy.orm import Session
 from services.veterinarianService import VeterinarianService
@@ -39,3 +39,6 @@ def get_veterinarian_by_id(vet_id: int, db: Session = Depends(get_db)):
 def get_vets_by_clinic_id(clinic_id: int, db: Session = Depends(get_db)):
     return VeterinarianService.get_vets_by_clinic_id(clinic_id, db)
 
+@veterinarians.get(endpoint + "/reviews/{vet_id}", response_model=VeterinarianProfileSchemaGet, status_code=status.HTTP_200_OK, tags=[tag])
+def get_vet_by_id_details(vet_id: int, db: Session = Depends(get_db)):
+    return VeterinarianService.get_vet_by_id_details(vet_id, db)

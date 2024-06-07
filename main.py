@@ -10,6 +10,7 @@ from routes.petOwner import pet_owners as pet_owner_router
 from routes.veterinarian import veterinarians as veterinarian_router
 from routes.disease import diseases as disease_router
 from routes.vaccination import vaccinations as vaccine_router
+from routes.review import reviews as review_router
 from auth.routes.auth import auth as auth_router
 from config.routes import prefix
 Base.metadata.create_all(bind=engine)
@@ -28,4 +29,4 @@ app.include_router(pet_owner_router,  prefix= prefix)
 app.include_router(veterinarian_router, prefix= prefix)
 app.include_router(disease_router, prefix= prefix)
 app.include_router(vaccine_router,  prefix= prefix)
-
+app.include_router(review_router,  prefix= prefix)

@@ -1,19 +1,26 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from config.db import get_db
-from models.user import User
+from sqlalchemy.orm import joinedload
+
 from models.veterinarian import Veterinarian
-from schemas.veterinarian import VeterinarianSchemaPost, VeterinarianSchemaGet
+
+from schemas.veterinarian import VeterinarianProfileSchemaGet, VeterinarianSchemaPost, VeterinarianSchemaGet
 from typing import List
+
+from services.reviewService import ReviewService
 from services.userService import UserService
+
 from auth.schemas.auth import UserType
+
 from schemas.veterinarian import VeterinarianSchemaGet
 from services.veterinaryClinicService import VeterinaryClinicService
-from sqlalchemy.orm import joinedload
 from auth.services.token import TokenServices
 from auth.schemas.auth import Token
 from datetime import timedelta
+from sqlalchemy.orm.exc import NoResultFound
 
+from models.review import Review
 
 class VeterinarianService:
 
@@ -82,6 +89,28 @@ class VeterinarianService:
 
         return VeterinarianSchemaGet.from_orm(veterinarian, user)
     
+    @staticmethod
+    def get_vet_by_id_details(vet_id: int, db: Session) -> VeterinarianProfileSchemaGet:
+        try:
+            veterinarian = (
+                db.query(Veterinarian)
+                .filter(Veterinarian.id == vet_id)
+                .options(
+                    joinedload(Veterinarian.clinic),
+                    joinedload(Veterinarian.user)
+                )
+                .one()  
+            )
+        except NoResultFound:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Veterinarian not found")
+        
+        reviews = ReviewService.get_reviews_by_veterinarian_id(vet_id, db)
+            
+
+        return VeterinarianProfileSchemaGet.from_orm(veterinarian, reviews)
+
+
+
     @staticmethod
     def get_vets_by_clinic_id(clinic_id: int, db: Session) -> List[VeterinarianSchemaGet]:
         vets = db.query(Veterinarian).filter(Veterinarian.clinic_id == clinic_id).options(joinedload(Veterinarian.user)).all()

@@ -13,6 +13,9 @@ class PetOwner(Base):
     location = Column(String(50))
     subscriptionType = Column(Enum(SubscriptionType, name='subscription_type'), default=SubscriptionType.Basic)
 
-    user = relationship("User", back_populates="pet_owner")
-    pets = relationship("Pet", back_populates="pet_owner", cascade="all, delete-orphan")
+    user = relationship("User", back_populates="pet_owner") 
+    pets = relationship("Pet", back_populates="pet_owner", cascade="all, delete-orphan")    
+    reviews = relationship('Review', back_populates='petowner')  # Relación con Review
+
 from models.pet import Pet  # Importa la clase Pet después de la definición de PetOwner
+
