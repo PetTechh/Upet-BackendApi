@@ -7,6 +7,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 import uvicorn
 from config.db import SessionLocal, get_db
+from models.availability import Availability
 from scheduler import check_and_reset_availabilities
 from services.availability import AvailabilityService
 from apscheduler.triggers.cron import CronTrigger
@@ -58,8 +59,8 @@ scheduler.start()
 def job_wrapper():
     db = SessionLocal()
     print("Running job")
-    AvailabilityService.delete_weekly_availabilities(db)
-    AvailabilityService.create_weekly_availabilities(db)
+    if db.query(Availability).count() == 0:
+        check_and_reset_availabilities(db)
     db.close()
 
 

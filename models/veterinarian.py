@@ -19,6 +19,6 @@ class Veterinarian(Base):
 
     user = relationship("User", back_populates="veterinarian")
     clinic = relationship("VeterinaryClinic", back_populates="veterinarians")
-    availabilities = relationship('Availability', back_populates='veterinarian')    
+    availabilities = relationship('Availability', back_populates='veterinarian')
     appointments = relationship('Appointment', back_populates='veterinarian')
     reviews = relationship("Review", back_populates="veterinarian")
