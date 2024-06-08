@@ -18,5 +18,6 @@ class Pet(Base):
     gender = Column(Enum(GenderEnum, name='gender'), nullable=False)
 
     pet_owner = relationship("PetOwner", back_populates="pets")
+    appointments = relationship('Appointment', back_populates='pet')
 
 

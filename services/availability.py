@@ -1,4 +1,6 @@
 from datetime import date, datetime, timedelta
+from sqlite3 import ProgrammingError
+from sqlalchemy import Inspector
 from sqlalchemy.orm import Session
 from models.availability import Availability
 from models.appointment import Appointment  # Importa la clase Appointment
@@ -41,6 +43,18 @@ class AvailabilityService:
             AvailabilityService.create_weekly_availabilities_for_veterinarian(vet, db, start_of_week, days_until_saturday)
 
         db.commit()
+
+    @staticmethod
+    def create_weekly_by_new_veterinarian(vet: Veterinarian, db: Session):
+        today = datetime.now().date()
+        if today.weekday() == 6:  # Si hoy es domingo
+            start_of_week = today + timedelta(days=1)
+        else:
+            start_of_week = today
+        
+        days_until_saturday = 5 - start_of_week.weekday()
+        
+        AvailabilityService.create_weekly_availabilities_for_veterinarian(vet, db, start_of_week, days_until_saturday)
 
     @staticmethod
     def create_weekly_availabilities_for_veterinarian(vet: Veterinarian, db: Session, start_of_week: date, days_until_saturday: int):
