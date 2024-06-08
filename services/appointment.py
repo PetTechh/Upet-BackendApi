@@ -15,9 +15,12 @@ class AppointmentService:
     @staticmethod
     def get_all_appointments(db: Session):
         appointments = db.query(Appointment).all()
+        appointments_list = []
         for appointment in appointments:
-            appointments = AppointmentSchemaGet.from_orm(appointment)
-        return appointments
+            appointment_data = AppointmentSchemaGet.from_orm(appointment)
+            appointments_list.append(appointment_data)
+        return appointments_list
+
 
     @staticmethod
     def get_appointments_by_pet_id(pet_id: int, db: Session):

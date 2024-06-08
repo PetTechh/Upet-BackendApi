@@ -17,7 +17,7 @@ MYSQL_DATABASE = 'railway'
 
 #URL_DATABASE = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
 
-URL_DATABASE = 'mysql://root:KLyzHquSzomBjVXrgjMjutjJqLKqQvgw@viaduct.proxy.rlwy.net:29253/railway'
+URL_DATABASE = 'mysql+pymysql://root:KLyzHquSzomBjVXrgjMjutjJqLKqQvgw@viaduct.proxy.rlwy.net:29253/railway'
 
 engine = create_engine(URL_DATABASE)
 
