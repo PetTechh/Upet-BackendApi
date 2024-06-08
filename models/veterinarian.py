@@ -4,7 +4,6 @@ from config.db import Base, engine
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey
 
-from models.availability import Availability
 
 from models.user import User  # Importa la clase User desde models.user
 from models.veterinaryClinic import VeterinaryClinic  # Importa VeterinaryClinic después de User

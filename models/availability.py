@@ -12,4 +12,7 @@ class Availability(Base):
     end_time = Column(Time, nullable=False)
     veterinarian_id = Column(Integer, ForeignKey('veterinarians.id'))
     is_available = Column(Boolean, default=True)
+   
+   
     veterinarian = relationship('Veterinarian', back_populates='availabilities')
+

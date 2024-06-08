@@ -46,9 +46,9 @@ class VeterinarianService:
         db.add(new_veterinarian)
         user.registered = True
         db.commit()
-
         
-        AvailabilityService.create_weekly_availabilities_for_veterinarian(new_veterinarian, db)
+
+        AvailabilityService.create_weekly_by_new_veterinarian(new_veterinarian, db),
         token = TokenServices.create_access_token(user.email, new_veterinarian.id, user.userType, user.registered,timedelta(hours=1))
 
         return Token(access_token=token, token_type="bearer")
@@ -62,7 +62,7 @@ class VeterinarianService:
     def get_vet_by_user_id(user_id: int, db: Session) -> VeterinarianSchemaGet:
         veterinarian = (
             db.query(Veterinarian)
-            .filter(Veterinarian.userId == user_id)
+            .filter(Veterinarian.user_id == user_id)
             .options(joinedload(Veterinarian.user))  # Carga la relación User junto con Veterinarian
             .first()
         )
