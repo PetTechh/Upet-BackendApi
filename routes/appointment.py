@@ -53,11 +53,3 @@ def get_upcoming_appointments_by_veterinarian_id(veterinarian_id: int, db: Sessi
 @appointments.get(endpoint + "/veterinarian/{veterinarian_id}/past", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_past_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depends(get_db)):
     return AppointmentService.get_past_appointments_by_veterinarian_id(veterinarian_id, db)
-
-@appointments.delete(endpoint + "/{appointment_id}", status_code=status.HTTP_204_NO_CONTENT, tags=[tag])
-def delete_appointment(appointment_id: int, db: Session = Depends(get_db)):
-    appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
-    if not appointment:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appointment not found")
-    db.delete(appointment)
-    db.commit()
