@@ -84,7 +84,7 @@ class AuthServices:
 
         if user_response.registered == True:
             if user_response.userType == UserType.Vet:
-                role_id = VeterinarianService.get_veterinarian_by_user_id(user_response.id, db).id
+                role_id = VeterinarianService.get_vet_by_user_id(user_response.id, db).id
             elif user_response.userType == UserType.Owner:
                 role_id = PetOwnerService.get_petowner_by_user_id(user_response.id, db).id
         else:

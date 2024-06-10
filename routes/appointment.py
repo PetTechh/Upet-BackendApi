@@ -18,6 +18,14 @@ endpoint = "/appointments"
 def get_appointments(db: Session = Depends(get_db)):
     return AppointmentService.get_all_appointments(db)
 
+@appointments.get(endpoint + "/owner/{owner_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_appointments_by_owner_id(owner_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_appointments_by_owner_id(owner_id, db)
+
+@appointments.get(endpoint + "/{appointment_id}", response_model=AppointmentSchemaGet, status_code=status.HTTP_200_OK, tags=[tag])
+def get_appointment_by_id(appointment_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_appointment_by_id(appointment_id, db)
+
 @appointments.get(endpoint + "/pet/{pet_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_appointments_by_pet_id(pet_id: int, db: Session = Depends(get_db)):
     return AppointmentService.get_appointments_by_pet_id(pet_id, db)
@@ -29,3 +37,27 @@ def get_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depe
 @appointments.post(endpoint, response_model=AppointmentSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
 def create_appointment(appointment: AppointmentSchemaPost, db: Session = Depends(get_db)):
     return AppointmentService.create_appointment(appointment, db)
+
+@appointments.get(endpoint + "/owner/{owner_id}/upcoming", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_upcoming_appointments_by_owner_id(owner_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_upcoming_appointments_by_owner_id(owner_id, db)
+
+@appointments.get(endpoint + "/owner/{owner_id}/past", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_past_appointments_by_owner_id(owner_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_past_appointments_by_owner_id(owner_id, db)
+
+@appointments.get(endpoint + "/veterinarian/{veterinarian_id}/upcoming", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_upcoming_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_upcoming_appointments_by_veterinarian_id(veterinarian_id, db)
+
+@appointments.get(endpoint + "/veterinarian/{veterinarian_id}/past", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_past_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_past_appointments_by_veterinarian_id(veterinarian_id, db)
+
+@appointments.delete(endpoint + "/{appointment_id}", status_code=status.HTTP_204_NO_CONTENT, tags=[tag])
+def delete_appointment(appointment_id: int, db: Session = Depends(get_db)):
+    appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+    if not appointment:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appointment not found")
+    db.delete(appointment)
+    db.commit()

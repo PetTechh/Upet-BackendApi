@@ -58,6 +58,7 @@ class VeterinarianService:
         vets = db.query(Veterinarian).options(joinedload(Veterinarian.user)).all()
         return [VeterinarianSchemaGet.from_orm(vet, vet.user) for vet in vets]
 
+
     @staticmethod
     def get_vet_by_user_id(user_id: int, db: Session) -> VeterinarianSchemaGet:
         veterinarian = (

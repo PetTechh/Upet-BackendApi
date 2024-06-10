@@ -19,7 +19,7 @@ class UserService:
         if role == UserType.Owner:
             user_id = db.query(PetOwner).filter(PetOwner.id == role_id).first().userId
         else:
-            user_id = db.query(Veterinarian).filter(Veterinarian.id == role_id).first().userId
+            user_id = db.query(Veterinarian).filter(Veterinarian.id == role_id).first().user_id
         user = UserService.get_user_by_id(user_id, db)
         user.image_url = image
         db.commit()
