@@ -4,20 +4,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'KLyzHquSzomBjVXrgjMjutjJqLKqQvgw'
-MYSQL_HOST = 'viaduct.proxy.rlwy.net'
-MYSQL_PORT = '29253'
-MYSQL_DATABASE = 'railway'
-#mysql://root:wUtLBypWHLWWnRUmdFtmdWszWZYYKoaL@viaduct.proxy.rlwy.net:36102/railway
-#mysql://root:MmeGvXZLtObSxyOWGpsIpnMioRtpOJMl@viaduct.proxy.rlwy.net:37129/railway
-#mysql://root:fvYQogwpIoplNmoKtNhgxvbhlHHQVvaS@viaduct.proxy.rlwy.net:58668/railway
-#mysql://root:FfgUEZJRiDPRjPsYHlTaokDXYDAhjuHY@viaduct.proxy.rlwy.net:58091/railway
-#URL_DATABASE = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
-#URL_DATABASE = 'mysql+pymysql://root:12345@localhost:3306/veterinarys'
-
-#URL_DATABASE = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
-
-URL_DATABASE = 'mysql+pymysql://root:KLyzHquSzomBjVXrgjMjutjJqLKqQvgw@viaduct.proxy.rlwy.net:29253/railway'
+MYSQL_PASSWORD = 'Y9UEFrxH14OgZ872K6TueyJjD53mts0Q'
+MYSQL_HOST = 'sfo1.clusters.zeabur.com'
+MYSQL_PORT = '30777'
+MYSQL_DATABASE = 'zeabur'
+#mysqlsh --sql --host=sfo1.clusters.zeabur.com --port=30777 --user=root --password=Y9UEFrxH14OgZ872K6TueyJjD53mts0Q --schema=zeabur
+URL_DATABASE = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
 
 engine = create_engine(URL_DATABASE)
 
