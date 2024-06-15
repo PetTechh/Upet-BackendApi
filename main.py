@@ -1,15 +1,8 @@
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
-import threading
-import schedule
-import time
-from fastapi import Depends
-from sqlalchemy.orm import Session
+import os
 import uvicorn
-from config.db import SessionLocal, get_db
+from config.db import SessionLocal
 from models.availability import Availability
 from scheduler import check_and_reset_availabilities
-from services.availability import AvailabilityService
 from apscheduler.triggers.cron import CronTrigger
 
 
@@ -26,16 +19,32 @@ from routes.veterinarian import veterinarians as veterinarian_router
 from routes.disease import diseases as disease_router
 from routes.vaccination import vaccinations as vaccine_router
 from routes.review import reviews as review_router
-from routes.availability import availabilities as availability_router, reset_availabilities
+from routes.availability import availabilities as availability_router
 from auth.routes.auth import auth as auth_router
 from config.routes import prefix
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.date import DateTrigger
-
+from contextlib import asynccontextmanager
 from scheduler import check_and_reset_availabilities
+
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+    
+    def job_wrapper():
+        db = SessionLocal()
+        print("Running job")
+        if db.query(Availability).count() == 0:
+            check_and_reset_availabilities(db)
+        db.close()
+
+    scheduler.add_job(job_wrapper, trigger=CronTrigger(day_of_week="sun", hour=0, minute=0))
+    yield
+    scheduler.shutdown()
+
+app = FastAPI(lifespan=lifespan)
 
 
 app.include_router(auth_router,  prefix= prefix)
@@ -52,22 +61,6 @@ app.include_router(vaccine_router,  prefix= prefix)
 app.include_router(review_router,  prefix= prefix)
 app.include_router(availability_router,  prefix= prefix)
 
-# Configurar el programador
-scheduler = BackgroundScheduler()
-scheduler.start()
-
-def job_wrapper():
-    db = SessionLocal()
-    print("Running job")
-    if db.query(Availability).count() == 0:
-        check_and_reset_availabilities(db)
-    db.close()
-
-
-# Programar la tarea para que se ejecute hoy a las 15:38
-scheduler.add_job(job_wrapper, trigger=CronTrigger(day_of_week="sun", hour=0, minute=0))
-
-# Asegurarse de cerrar el programador al apagar la aplicación
-@app.on_event("shutdown")
-def shutdown_event():
-    scheduler.shutdown()
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
