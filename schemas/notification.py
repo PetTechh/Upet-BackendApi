@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -6,11 +6,11 @@ class NotificationSchemaPost(BaseModel):
     petOwnerId: int
     type: str
     message: str
-    datetime: date
+    datetime: datetime
 
 class NotificationSchemaGet(BaseModel):
     id: int
     petOwnerId: int
     type: str
     message: str
-    datetime: date
+    datetime: datetime

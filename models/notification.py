@@ -9,6 +9,6 @@ class Notification(Base):
     petOwnerId = Column(Integer, ForeignKey('petowners.id'))
     type = Column(String(255))
     message = Column(String(255))
-    datetime = Column(Date)
+    datetime = Column(DateTime)
 
 
