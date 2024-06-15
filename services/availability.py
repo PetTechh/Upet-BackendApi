@@ -78,5 +78,4 @@ class AvailabilityService:
 
     @staticmethod
     def delete_weekly_availabilities(db: Session):
-        db.query(Availability).delete()
         db.commit()

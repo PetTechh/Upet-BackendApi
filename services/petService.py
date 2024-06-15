@@ -8,11 +8,13 @@ from fastapi import Depends
 from fastapi import HTTPException, status
 from models.petOwner import PetOwner
 from models.pet import Pet
+from schemas.medicalHistory import MedicalHistorySchemaPost
 from schemas.pet import PetSchemaPost, PetSchemaResponse
+from services.medical_history import MedicalHistoryService
 
 class PetServices:
     @staticmethod
-    def create_new_pet(petowner_id: int, pet: PetSchemaPost, db: Session = Depends(get_db)):
+    def create_new_pet(petowner_id: int, pet: PetSchemaPost, db: Session ):
         pet_owner = db.query(PetOwner).filter(PetOwner.id == petowner_id).first()
         if not pet_owner:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El propietario de la mascota no existe.")
@@ -32,12 +34,15 @@ class PetServices:
         db.add(new_pet)
         db.commit()
         db.refresh(new_pet)  # Para cargar el ID generado
+        
+    
+        medicalHistory = MedicalHistorySchemaPost(
+            petId=new_pet.id,  
+            date=datetime.date.today(),
+            description=f"Creación de historial médico de {new_pet.name}"
+        )
+        MedicalHistoryService.add_medical_history(medicalHistory,db=db)
         return new_pet
-
-    @staticmethod
-    def get_petowners(db: Session = Depends(get_db)):
-        pets = db.query(Pet).all()
-        return pets
 
     
     @staticmethod
