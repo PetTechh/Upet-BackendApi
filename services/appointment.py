@@ -4,13 +4,15 @@ import pytz
 import operator
 from datetime import datetime
 from sqlalchemy.orm import Session
+from Enums.statusAppointmentEnum import StatusAppointmentEnum
 from models.otps import OTP
 from config.db import get_db
 from fastapi import HTTPException, status, Depends
 from models.appointment import Appointment
 from models.pet import Pet
+from models.petOwner import PetOwner
 from models.veterinarian import Veterinarian
-from schemas.appointment import AppointmentSchemaGet, AppointmentSchemaPost
+from schemas.appointment import AppointmentSchemaGet, AppointmentSchemaCreate, AppointmentSchemaUpdate
 
 class AppointmentService:
 
@@ -65,32 +67,34 @@ class AppointmentService:
     
     @staticmethod
     def get_upcoming_appointments_by_owner_id(owner_id: int, db: Session):
-        pets = db.query(Pet).filter(Pet.petOwnerId == owner_id)
-        if not pets.first():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El dueño no tiene mascotas registradas.")
-        return AppointmentService.get_appointments(pets, operator.ge)
-    
+        return AppointmentService.get_appointments_by_entity("owner", owner_id, db, StatusAppointmentEnum.upcoming)
+
     @staticmethod
-    def get_past_appointments_by_owner_id(owner_id: int, db: Session):
-        pets = db.query(Pet).filter(Pet.petOwnerId == owner_id)
-        if not pets.first():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El dueño no tiene mascotas registradas.")
-        return AppointmentService.get_appointments(pets, operator.lt)
-    
+    def get_completed_appointments_by_owner_id(owner_id: int, db: Session):
+        return AppointmentService.get_appointments_by_entity("owner", owner_id, db, StatusAppointmentEnum.completed)
+
     @staticmethod
-    def get_past_appointments_by_veterinarian_id(veterinarian_id: int, db: Session):
-        veterinarian = db.query(Veterinarian).filter(Veterinarian.id == veterinarian_id)
-        if not veterinarian.first():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El veterinario no existe.")
-        return AppointmentService.get_appointments(veterinarian, operator.lt)
-    
+    def get_completed_appointments_by_veterinarian_id(veterinarian_id: int, db: Session):
+        return AppointmentService.get_appointments_by_entity("veterinarian", veterinarian_id, db, StatusAppointmentEnum.completed)
+
     @staticmethod
     def get_upcoming_appointments_by_veterinarian_id(veterinarian_id: int, db: Session):
-        veterinarian = db.query(Veterinarian).filter(Veterinarian.id == veterinarian_id)
-        if not veterinarian.first():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El veterinario no existe.")
-        return AppointmentService.get_appointments(veterinarian, operator.ge)
-        
+        return AppointmentService.get_appointments_by_entity("veterinarian", veterinarian_id, db, StatusAppointmentEnum.upcoming)
+
+    @staticmethod
+    def get_appointments_by_entity(entity, entity_id, db: Session, status_enum):
+
+        if entity== "owner":      
+            pet = db.query(Pet).filter(Pet.petOwnerId == entity_id).first()
+            if not pet:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La mascota no existe.")
+            appointments = db.query(Appointment).filter(Appointment.pet_id == pet.id).filter(Appointment.status == status_enum).all()
+            
+        if entity == "veterinarian":
+            appointments = db.query(Appointment).filter(Appointment.veterinarian_id == entity_id).filter(Appointment.status == status_enum).all()
+            
+
+        return appointments
         
     @staticmethod
     def get_appointments_by_veterinarian_id(veterinarian_id: int, db: Session):
@@ -109,7 +113,7 @@ class AppointmentService:
         return appointment
 
     @staticmethod
-    def create_appointment(appointment: AppointmentSchemaPost, db: Session):
+    def create_appointment(appointment: AppointmentSchemaCreate, db: Session):
 
         pet = db.query(Pet).filter(Pet.id == appointment.pet_id).first()
         if not pet:
@@ -124,3 +128,17 @@ class AppointmentService:
         db.commit()
         db.refresh(new_appointment)
         return new_appointment
+    
+    @staticmethod
+    def post_appointment( appointment_id: int, result: AppointmentSchemaUpdate, db: Session):
+        appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+        if not appointment:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La cita no existe.")
+        
+        appointment.diagnosis = result.diagnosis
+        appointment.treatment = result.treatment
+        
+        appointment.status = StatusAppointmentEnum.completed
+        db.commit()
+        db.refresh(appointment)
+        return appointment

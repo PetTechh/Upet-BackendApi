@@ -20,7 +20,7 @@ from routes.veterinaryClinic import veterinary_clinics as veterinary_clinic_rout
 from routes.pet import pets as pet_router
 from routes.appointment import appointments as appointment_router
 from routes.notification import notifications as notification_router
-from routes.medicalHistory import medical_historys as medical_history_router
+from routes.medicalHistory import medical_histories as medical_history_router
 from routes.petOwner import pet_owners as pet_owner_router
 from routes.veterinarian import veterinarians as veterinarian_router
 from routes.disease import diseases as disease_router

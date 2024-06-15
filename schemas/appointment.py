@@ -2,7 +2,8 @@ from datetime import datetime, timedelta, time, date
 from typing import Optional
 from pydantic import BaseModel, Field
 from models.appointment import Appointment
-class AppointmentSchemaPost(BaseModel):
+
+class AppointmentSchemaCreate(BaseModel):
     date_day: date
     description: str
     start_time: time
@@ -22,6 +23,10 @@ class AppointmentSchemaPost(BaseModel):
             pet_id=self.pet_id,
             veterinarian_id=self.veterinarian_id
         )   
+
+class AppointmentSchemaUpdate(BaseModel):
+    diagnosis: str
+    treatment: str
     
 
 class AppointmentSchemaGet(BaseModel):
@@ -30,10 +35,11 @@ class AppointmentSchemaGet(BaseModel):
     diagnosis: Optional[str]
     treatment: Optional[str]
     description: str
-    pet_id: int
-    veterinarian_id: int
     start_time: time
     end_time: time
+    pet_id: int
+    veterinarian_id: int
+    status: str
 
     class Config:
         orm_mode = True
@@ -49,5 +55,6 @@ class AppointmentSchemaGet(BaseModel):
             pet_id=appointment.pet_id,
             veterinarian_id=appointment.veterinarian_id,
             start_time=appointment.start_time,
-            end_time=appointment.end_time
+            end_time=appointment.end_time,
+            status=appointment.status
         )
