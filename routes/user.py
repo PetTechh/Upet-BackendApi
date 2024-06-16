@@ -2,13 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from config.db import get_db
 
 from models.user import User
-
-from schemas.user import  UserSchemaGet
-
 from cryptography.fernet import Fernet
 from sqlalchemy.orm import Session
 from services.userService import UserService
-from schemas.user import UserChangeImage
+from schemas.user import UserChangeImage, UserSchemaGet
 users = APIRouter()
 tag = "Users"
 

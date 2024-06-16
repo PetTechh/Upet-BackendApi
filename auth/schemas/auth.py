@@ -26,3 +26,16 @@ class UserSchemaResponse(BaseModel):
     email: str
     userType: UserType
     registered: bool
+
+class UserChangePasswordRole(BaseModel):
+    password: str
+    role: UserType  
+
+class UserChangePassword(BaseModel):
+    password: str
+
+class UserForgotPassword(BaseModel):
+    email: str
+
+class UserVerifyCode(BaseModel):
+    code: str        

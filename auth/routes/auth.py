@@ -6,12 +6,12 @@ from auth.schemas.auth import  Token, UserSchemaResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 from datetime import timedelta
-from schemas.user import UserSchemaPost
+from schemas.user import UserSchemaPost, UserSchemaGet
 from models.user import User
 from  passlib.hash import bcrypt as func
 from auth.services.auth import AuthServices
 from ..config.auth import token_endpoint, tag, endpoint
-from auth.schemas.auth import CreateUserRequest
+from auth.schemas.auth import CreateUserRequest , UserChangePasswordRole, UserChangePassword, UserForgotPassword, UserVerifyCode
 auth = APIRouter()
 
 
@@ -35,3 +35,23 @@ async def sign_in(create_user_request: CreateUserRequest, db: Session = Depends(
         return {"User": user}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@auth.post(f"{endpoint}/forgot-password",  response_model=UserSchemaGet, tags=[tag])
+def request_code(request: UserForgotPassword, db: Session = Depends(get_db)):
+    user = AuthServices.request_code(request.email, db)
+    return user
+
+@auth.post(f"{endpoint}/verify_code",  response_model=UserSchemaGet, tags=[tag])
+def verify_code(user_id: str,  request: UserVerifyCode, db: Session = Depends(get_db)):
+    user = AuthServices.verify_code(user_id, request.code, db)
+    return user
+
+@auth.put(f"{endpoint}/change-password/{{user_id}}",  response_model=UserSchemaGet, tags=[tag])
+def change_password(user_id: int,  request: UserChangePassword, db: Session = Depends(get_db)):
+    user = AuthServices.change_password(user_id, request.password, db)
+    return user
+
+@auth.put(f"{endpoint}/change-password-by-role/{{role_id}}", response_model=UserSchemaGet, tags=[tag])
+def change_password_by_role(role_id: int, passwordChange: UserChangePasswordRole, db: Session = Depends(get_db)):
+    user = AuthServices.change_password_by_role(role_id, passwordChange.role,  passwordChange.password, db)
+    return user

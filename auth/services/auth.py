@@ -1,9 +1,15 @@
 from datetime import datetime, timedelta
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import string
+import secrets
+from models.petOwner import PetOwner
+from models.veterinarian import Veterinarian
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from config.db import get_db
 from models.user import User
 from passlib.hash import bcrypt as bcrypt_context
 from typing import Annotated
@@ -93,3 +99,69 @@ class AuthServices:
         token = TokenServices.create_access_token(user_response.email, role_id, user_response.userType, user_response.registered, timedelta(hours=1))
 
         return Token(access_token=token, token_type="bearer")
+    
+    @staticmethod
+    def change_password(user_id: int, password: str, db: Session):
+        user = db.query(User).filter(User.id == user_id).first()
+        user.password = bcrypt_context.encrypt(password.encode("utf-8"))
+        db.commit()
+        db.refresh(user)
+        return user
+    
+    @staticmethod
+    def change_password_by_role( role_id: int, role, password: str, db: Session):
+        if role == UserType.Owner:
+            user_id = db.query(PetOwner).filter(PetOwner.id == role_id).first().userId
+        else:
+            user_id = db.query(Veterinarian).filter(Veterinarian.id == role_id).first().user_id
+        return AuthServices.change_password(user_id, password, db)    
+         
+    
+    @staticmethod
+    def request_code(email: str, db: Session):
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist.")
+        
+        verification_code = ''.join(secrets.choice(string.digits) for _ in range(5))
+        user.reset_code = verification_code
+        user.reset_code_expiry = datetime.utcnow() + timedelta(minutes=5)
+        db.commit()
+        try:
+            AuthServices.send_email_reset_password(email, verification_code)
+        except Exception as e:
+            print(f"Failed to send reset email: {e}")
+        return user
+
+    @staticmethod
+    def send_email_reset_password(email, verification_code):
+        message = f"To change your password, please enter the following code: {verification_code}"
+        sender_email = "upet.recovery@gmail.com"
+        sender_password = "wcpwiivynkcoizlf"
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = email
+        msg['Subject'] = "Password Reset - UPET"
+
+        msg.attach(MIMEText(message, 'plain'))
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(sender_email, sender_password)
+            text = msg.as_string()
+            server.sendmail(sender_email, email, text)
+            server.quit()
+            print(f"Email successfully sent to {email}")
+        except Exception as e:
+            print(f"Error sending email: {e}")
+            raise 
+
+    @staticmethod
+    def verify_code(user_id: int, code: str, db: Session):
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist.")
+        if user.reset_code == code and user.reset_code_expiry > datetime.utcnow():
+            return user
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid code or expired.")    
