@@ -8,6 +8,11 @@ from schemas.review import ReviewSchemaGet
 class VeterinarianSchemaPost(BaseModel):
     clinicName: str
     otp_password: str
+
+class VeterinarianUpdateInformation(BaseModel):
+    name: str
+    description: Optional[str]
+    experience: Optional[int]    
     
 class VeterinarianSchemaGet(BaseModel):
     id: int
@@ -32,6 +37,13 @@ class VeterinarianSchemaGet(BaseModel):
             experience=veterinarian.experience,
             clinicId=veterinarian.clinic_id
         )
+    
+    @staticmethod
+    def update_information(veterinarian: Veterinarian, newInformation: VeterinarianUpdateInformation):
+        veterinarian.user.name = newInformation.name
+        veterinarian.description = newInformation.description
+        veterinarian.experience = newInformation.experience
+        return veterinarian 
     
 class VeterinarianProfileSchemaGet(BaseModel):
     id: int
@@ -65,3 +77,9 @@ class VeterinarianProfileSchemaGet(BaseModel):
             clinicAddress=clinic.location,
             reviews=reviews
         )
+    
+   
+    
+
+
+   

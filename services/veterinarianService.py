@@ -7,7 +7,7 @@ from models.appointment import Appointment
 from models.availability import Availability
 from models.veterinarian import Veterinarian
 
-from schemas.veterinarian import VeterinarianProfileSchemaGet, VeterinarianSchemaPost, VeterinarianSchemaGet
+from schemas.veterinarian import VeterinarianProfileSchemaGet, VeterinarianSchemaPost, VeterinarianSchemaGet,  VeterinarianUpdateInformation
 from typing import List
 
 from services.reviewService import ReviewService
@@ -158,3 +158,14 @@ class VeterinarianService:
             "date": day.strftime("%Y-%m-%d"),
             "available_times": available_times
         }
+
+    @staticmethod
+    def change_DataVet(vet_id: int, vet: VeterinarianUpdateInformation, db: Session):
+        vet_db = db.query(Veterinarian).filter(Veterinarian.id == vet_id).first()
+        if not vet_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Veterinarian not found")
+  
+        VeterinarianSchemaGet.update_information(vet_db, vet)
+        db.commit()
+        db.refresh(vet_db)
+        return VeterinarianSchemaGet.from_orm(vet_db, vet_db.user)      
