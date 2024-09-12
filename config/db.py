@@ -1,15 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
 
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'eajwUQjoYCHCAxGfmMhfkzdcPshzzCdw'
-MYSQL_HOST = 'roundhouse.proxy.rlwy.net'
-MYSQL_PORT = '40438'
-MYSQL_DATABASE = 'railway'
-
-URL_DATABASE = 'mysql+pymysql://root:12345@localhost:3306/veterinarys'
-#URL_DATABASE = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
+MYSQL_USER = 'avnadmin'
+MYSQL_PASSWORD = 'AVNS_9JcqR4viB2lIWgYPXxf'
+MYSQL_HOST = 'upet-enzotrujilloacosta-13ef.i.aivencloud.com'
+MYSQL_PORT = '20311'
+MYSQL_DATABASE = 'defaultdb'
+#mysqlsh --sql --host=sfo1.clusters.zeabur.com --port=30777 --user=root --password=Y9UEFrxH14OgZ872K6TueyJjD53mts0Q --schema=zeabur
+URL_DATABASE = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
 
 engine = create_engine(URL_DATABASE)
 
@@ -19,7 +19,7 @@ Base = declarative_base()
 
 
 
-def get_db():
+def get_db() :
     db = SessionLocal()
     try:
         yield db
