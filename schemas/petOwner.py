@@ -1,17 +1,42 @@
 from pydantic import BaseModel, Field
-from enum import Enum
-
-class SubscriptionType(str, Enum):
-    Basic = "Basic"
-    Advanced = "Advanced"
-    Pro = "Pro"
+from Enums.subscriptionTypeEnum import SubscriptionType
+from models.petOwner import PetOwner
+from models.user import User
 
 class PetOwnerSchemaPost(BaseModel):
     numberPhone: str
+    location: str
+
+class PetOwnerUpdateInformation(BaseModel):
+    numberPhone: str
+    location: str
+    name : str
 
 class PetOwnerSchemaGet(BaseModel):
     id: int
-    userId: int
+    name: str
     numberPhone: str
+    image_url: str
+    location: str
     subscriptionType: SubscriptionType
     
+    class Config:
+        from_attributes = True
+
+    @classmethod
+    def from_orm(cls, petOwner: PetOwner, user: User):
+        return cls(
+            id=petOwner.id,
+            name=user.name,
+            numberPhone=petOwner.numberPhone,
+            location=petOwner.location,
+            image_url=user.image_url,
+            subscriptionType=petOwner.subscriptionType
+        )
+    
+    @staticmethod
+    def update_information(petOwner: PetOwner, newInformation: PetOwnerUpdateInformation):
+        petOwner.location = newInformation.location
+        petOwner.numberPhone = newInformation.numberPhone
+        petOwner.user.name = newInformation.name
+        return petOwner

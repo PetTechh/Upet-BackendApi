@@ -1,16 +1,14 @@
 from pydantic import BaseModel
-from enum import Enum
+from Enums.userTypeEnum import UserType
 
-class UserType(str, Enum):
-    Vet = "Vet"
-    Owner = "Owner"
+
 
 class UserSchemaGet(BaseModel):
     id: int
     name: str
     email: str
-    password: str
     userType: UserType
+    image_url: str
     registered: bool  # Agregar el campo registrado
 
 
@@ -20,4 +18,6 @@ class UserSchemaPost(BaseModel):
     password: str
     userType: UserType
 
-
+class UserChangeImage(BaseModel):
+    image_url: str
+    role: UserType

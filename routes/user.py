@@ -2,12 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from config.db import get_db
 
 from models.user import User
-
-from schemas.user import UserSchemaPost, UserSchemaGet
-
 from cryptography.fernet import Fernet
 from sqlalchemy.orm import Session
-
+from services.userService import UserService
+from schemas.user import UserChangeImage, UserSchemaGet
 users = APIRouter()
 tag = "Users"
 
@@ -17,23 +15,18 @@ func = Fernet(key)
 endpoint = "/users"
 
 
-@users.get(f"{endpoint}/auth/singin", response_model=list[UserSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+@users.get(f"{endpoint}", response_model=list[UserSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_users(db: Session = Depends(get_db)):
     return db.query(User).all()
 
-@users.post(f"{endpoint}/auth/singup", response_model=UserSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
-def create_user(user: UserSchemaPost, db: Session = Depends(get_db)):
-    existing_user = db.query(User).filter(User.email == user.email).first()
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El correo electrónico ya está registrado.")
+@users.get(f"{endpoint}/{{user_id}}", response_model=UserSchemaGet, tags=[tag])
+def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user
 
-    if user.userType not in ["Vet", "Owner"]:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="UserType debe ser 'Vet' u 'Owner'.")
-
-    new_user_data = {"name": user.name, "email": user.email, "userType": user.userType, "registered": False}
-    new_user_data["password"] = func.encrypt(user.password.encode("utf-8"))
-
-    new_user = User(**new_user_data)
-    db.add(new_user)
-    db.commit()
-    return new_user
+@users.put(f"{endpoint}/{{role_id}}", response_model=UserSchemaGet, tags=[tag])
+def change_image(role_id: int, imageChange: UserChangeImage, db: Session = Depends(get_db)):
+    user = UserService.change_image(role_id, imageChange.role,  imageChange.image_url, db)
+    return user

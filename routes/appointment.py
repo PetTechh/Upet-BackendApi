@@ -4,8 +4,10 @@ from config.db import get_db
 from models.appointment import Appointment
 from models.veterinarian import Veterinarian
 from models.pet import Pet
-from schemas.appointment import AppointmentSchemaGet, AppointmentSchemaPost
+from schemas.appointment import AppointmentSchemaGet, AppointmentSchemaCreate, AppointmentSchemaUpdate
 from datetime import datetime
+
+from services.appointment import AppointmentService
 
 appointments = APIRouter()
 tag = "Appointments"
@@ -14,60 +16,47 @@ endpoint = "/appointments"
 
 @appointments.get(endpoint, response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_appointments(db: Session = Depends(get_db)):
-    return db.query(Appointment).all()
+    return AppointmentService.get_all_appointments(db)
 
-@appointments.get(endpoint+ "/pet/{pet_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+
+@appointments.get(endpoint + "/owner/{owner_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_appointments_by_owner_id(owner_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_appointments_by_owner_id(owner_id, db)
+
+@appointments.get(endpoint + "/{appointment_id}", response_model=AppointmentSchemaGet, status_code=status.HTTP_200_OK, tags=[tag])
+def get_appointment_by_id(appointment_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_appointment_by_id(appointment_id, db)
+
+@appointments.get(endpoint + "/pet/{pet_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_appointments_by_pet_id(pet_id: int, db: Session = Depends(get_db)):
-    pet= db.query(Pet).filter(Pet.id == pet_id).first()
-    if not pet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La mascota no existe.")
-    appointments = db.query(Appointment).filter(Appointment.petId == pet_id).all()
-    if not appointments:
-        print("La mascota no tiene citas registradas.")
-    return appointments
+    return AppointmentService.get_appointments_by_pet_id(pet_id, db)
 
 @appointments.get(endpoint + "/veterinarian/{veterinarian_id}", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
 def get_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depends(get_db)):
-    veterinarian = db.query(Veterinarian).filter(Veterinarian.id == veterinarian_id).first()
-    if not veterinarian:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El veterinario no existe.")
-    
-    
-    appointments = db.query(Appointment).filter(Appointment.veterinarianId == veterinarian_id).all()
-    
-    if not appointments:
-        print("El veterinario no tiene citas registradas.")
-         
-    return appointments
-
+    return AppointmentService.get_appointments_by_veterinarian_id(veterinarian_id, db)
 
 @appointments.post(endpoint, response_model=AppointmentSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
-def create_appointment(appointment: AppointmentSchemaPost, db: Session = Depends(get_db)):
-    
-    if not is_valid_datetime_format(appointment.datetime):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El formato de la fecha y hora debe ser 'YYYY-MM-DD HH:MM:SS'.")
-    
-    
-    pet = db.query(Pet).filter(Pet.id == appointment.petId).first()
-    if not pet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La mascota no existe.")
-    
-    
-    veterinarian = db.query(Veterinarian).filter(Veterinarian.id == appointment.veterinarianId).first()
+def create_appointment(appointment: AppointmentSchemaCreate, db: Session = Depends(get_db)):
+    return AppointmentService.create_appointment(appointment, db)
 
-    if not veterinarian:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El veterinario no existe.")
+@appointments.get(endpoint + "/owner/{owner_id}/upcoming", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_upcoming_appointments_by_owner_id(owner_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_upcoming_appointments_by_owner_id(owner_id, db)
+
+@appointments.get(endpoint + "/owner/{owner_id}/past", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_past_appointments_by_owner_id(owner_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_completed_appointments_by_owner_id(owner_id, db)
+
+@appointments.get(endpoint + "/veterinarian/{veterinarian_id}/upcoming", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_upcoming_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_upcoming_appointments_by_veterinarian_id(veterinarian_id, db)
+
+@appointments.get(endpoint + "/veterinarian/{veterinarian_id}/past", response_model=list[AppointmentSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
+def get_past_appointments_by_veterinarian_id(veterinarian_id: int, db: Session = Depends(get_db)):
+    return AppointmentService.get_completed_appointments_by_veterinarian_id(veterinarian_id, db)
+
+@appointments.put(endpoint + "/{appointment_id}", response_model=AppointmentSchemaGet, status_code=status.HTTP_200_OK, tags=[tag])
+def update_appointment(appointment_id: int, appointment: AppointmentSchemaUpdate, db: Session = Depends(get_db)):
+    return AppointmentService.post_appointment(appointment_id, appointment, db)
+
     
-    new_appointment = Appointment(**appointment.dict())
-    db.add(new_appointment)
-    db.commit()
-    db.refresh(new_appointment)
-    return new_appointment
-
-
-def is_valid_datetime_format(datetime_str: str) -> bool:
-    try:
-        datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
-        return True
-    except ValueError:
-        return False
