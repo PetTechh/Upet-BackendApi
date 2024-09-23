@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from routes.user import users as user_router
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from config.db import Base, engine
 from routes.veterinaryClinic import veterinary_clinics as veterinary_clinic_router
 from routes.pet import pets as pet_router
@@ -46,7 +47,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(auth_router,  prefix= prefix)
 app.include_router(user_router, prefix= prefix)
 app.include_router(veterinary_clinic_router,  prefix= prefix)
