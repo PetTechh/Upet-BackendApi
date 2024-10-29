@@ -1,6 +1,5 @@
 from datetime import date, time
 from pydantic import BaseModel
-
 from models.availability import Availability
 
 class AvailabilitySchema(BaseModel):

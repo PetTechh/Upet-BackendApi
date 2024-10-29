@@ -65,9 +65,18 @@ class AvailabilityService:
         for i in range(days_until_saturday + 1):  # Horarios desde start_of_week hasta end_of_week
             date = start_of_week + timedelta(days=i)
 
+            # Si es el día actual, redondea la hora de inicio a los próximos 30 minutos
+            if date == datetime.now().date():
+                now = datetime.now()
+                minutes = (now.minute + 29) // 30 * 30  # Redondear a los próximos 30 minutos
+                start_time = now.replace(minute=0, second=0, microsecond=0) + timedelta(minutes=minutes)
+                start_time = max(start_time.time(), clinic_start_time)  # Asegura que no inicie antes del horario de la clínica
+            else:
+                start_time = clinic_start_time
+
             availability = Availability(
                 date=date,
-                start_time=clinic_start_time,
+                start_time=start_time,
                 end_time=clinic_end_time,
                 veterinarian_id=vet.id,
                 is_available=True
