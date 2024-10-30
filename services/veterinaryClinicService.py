@@ -19,6 +19,16 @@ class VeterinaryClinicService:
     @staticmethod
     def create_veterinary_clinic(clinic: VeterinaryClinicSchemaPost, db: Session):
         new_clinic = clinic.to_model() #transform the schema to a model
+        start_time = new_clinic.office_hours_start
+        end_time = new_clinic.office_hours_end
+        
+        if start_time < end_time:
+            raise HTTPException(status_code=400, detail="La hora de inicio no puede ser mayor a la hora de fin")
+        
+        if start_time == end_time:
+            raise HTTPException(status_code=400, detail="La hora de inicio no puede ser igual a la hora de fin")
+            
+
         db.add(new_clinic)
         db.commit()
         return new_clinic
