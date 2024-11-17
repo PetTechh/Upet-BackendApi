@@ -53,3 +53,11 @@ def get_smart_collar_by_id(collar_id: int, db: Session = Depends(get_db)):
         return service.get_by_id(collar_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    
+@smart_collar.get("/smart-collars/pet/{pet_id}", response_model=list[SmartCollarResponse])
+def get_smart_collars_by_pet_id(pet_id: int, db: Session = Depends(get_db)):
+    service = SmartCollarService(db)
+    try:
+        return service.get_by_pet_id(pet_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

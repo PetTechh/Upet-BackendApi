@@ -128,3 +128,27 @@ class SmartCollarService:
                 )
             except NoResultFound:
                 raise ValueError(f"No collar found with IDs {collar_id}")
+            
+    def get_by_pet_id(self, pet_id: int):
+            # Buscar los collares asociados al pet_id
+            collars = self.db.query(SmartCollar).filter(SmartCollar.pet_id == pet_id).all()
+
+            # Si no se encuentran collares, lanzar excepción
+            if not collars:
+                raise ValueError(f"No collars found for pet ID {pet_id}")
+
+            # Crear la lista de respuestas con los datos de los collares encontrados
+            collar_responses = []
+            for collar in collars:
+                location = LocationType(latitude=collar.latitude, longitude=collar.longitude)
+                collar_responses.append(SmartCollarResponse(
+                    id=collar.id,
+                    serial_number=collar.serial_number,
+                    temperature=collar.temperature,
+                    lpm=collar.lpm,
+                    battery=collar.battery,
+                    location=location,
+                    pet_id=collar.pet_id
+                ))
+
+            return collar_responses
