@@ -124,6 +124,7 @@ class SmartCollarService:
                     battery=collar.battery,
                     location=location,
                     pet_id=collar.pet_id
+
                 )
             except NoResultFound:
-                raise ValueError(f"No collar found with ID {collar_id}")
+                raise ValueError(f"No collar found with IDs {collar_id}")
