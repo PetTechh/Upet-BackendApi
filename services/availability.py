@@ -27,6 +27,8 @@ class AvailabilityService:
     
     @staticmethod
     def create_weekly_availabilities(db: Session):
+        db.query(Availability).delete()  
+
         today = datetime.now().date()
         if today.weekday() == 6:  # Si hoy es domingo
             start_of_week = today + timedelta(days=1)  # Lunes de esta semana
@@ -74,17 +76,23 @@ class AvailabilityService:
             else:
                 start_time = clinic_start_time
 
-            availability = Availability(
-                date=date,
-                start_time=start_time,
-                end_time=clinic_end_time,
-                veterinarian_id=vet.id,
-                is_available=True
-            )
-            db.add(availability)
+            # Verifica si ya existe una disponibilidad para esta fecha y hora
+            existing_availability = db.query(Availability).filter_by(date=date, start_time=start_time, veterinarian_id=vet.id).first()
+            
+            if not existing_availability:  # Solo crea la disponibilidad si no existe
+                availability = Availability(
+                    date=date,
+                    start_time=start_time,
+                    end_time=clinic_end_time,
+                    veterinarian_id=vet.id,
+                    is_available=True
+                )
+                db.add(availability)
 
         db.commit()
 
+
     @staticmethod
     def delete_weekly_availabilities(db: Session):
+        db.query(Availability).delete()  
         db.commit()

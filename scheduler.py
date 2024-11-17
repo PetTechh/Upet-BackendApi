@@ -11,7 +11,7 @@ from services.availability import AvailabilityService
 
 
 def check_and_reset_availabilities(db: Session):
-    AvailabilityService.delete_weekly_availabilities(db)
+    AvailabilityService.check_and_reset_availabilities(db)
     db.close()
 
 db = next(get_db())  # Obtener una sesión de base de datos

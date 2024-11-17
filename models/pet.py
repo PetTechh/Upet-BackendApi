@@ -4,6 +4,7 @@ from Enums.speciesEnum import SpecieEnum
 from Enums.genderEnum import GenderEnum
 from sqlalchemy.orm import relationship
 from models.petOwner import PetOwner
+from SmartCollar.Domain.Models.smart_colllar_model import SmartCollar
 
 class Pet(Base):
     __tablename__ = 'pets'
@@ -19,4 +20,4 @@ class Pet(Base):
 
     pet_owner = relationship("PetOwner", back_populates="pets")
     appointments = relationship('Appointment', back_populates='pet')
-    smartcollars = relationship("SmartCollar", back_populates="pet") 
+    smartcollars = relationship("SmartCollar", back_populates="pet")
