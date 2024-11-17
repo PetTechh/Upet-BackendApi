@@ -15,6 +15,16 @@ class SmartCollarRequest(BaseModel):
         orm_mode = True 
 
 
+class SmartCollarUpdateRequest(BaseModel):
+    temperature: float
+    lpm: int
+    battery: float
+    location: LocationType
+
+    class Config:
+        orm_mode = True 
+
+
 class SmartCollarResponse(BaseModel):
     id: int
     serial_number: str

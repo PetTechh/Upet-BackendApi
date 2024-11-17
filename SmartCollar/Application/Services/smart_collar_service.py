@@ -2,7 +2,7 @@ from sqlite3 import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from SmartCollar.Domain.Models.smart_colllar_model import SmartCollar
-from SmartCollar.Application.Schema.smart_collar_schema import SmartCollarRequest, SmartCollarResponse
+from SmartCollar.Application.Schema.smart_collar_schema import SmartCollarRequest, SmartCollarResponse, SmartCollarUpdateRequest
 from SmartCollar.Domain.ValueObject.location_type import LocationType
 from models.pet import Pet
 
@@ -69,20 +69,38 @@ class SmartCollarService:
             return True
         return False
 
-    def change_pet_association(self, collar_id: int, new_pet_id: int) -> SmartCollarResponse:
-        collar = self.db.query(SmartCollar).filter(SmartCollar.id == collar_id).first()
-        
-        if not collar:
-            raise NoResultFound(f"No collar found with id {collar_id}")
-        
-        # Verificar si el nuevo pet_id existe
-        pet = self.db.query(Pet).filter(Pet.id == new_pet_id).first()
-        if not pet:
-            raise NoResultFound(f"No pet found with id {new_pet_id}")
+    def update_smart_collar(self, collar_id: int, collar_data: SmartCollarUpdateRequest) -> SmartCollarResponse:
+            try:
+                # Buscar el collar en la base de datos
+                collar = self.db.query(SmartCollar).filter(SmartCollar.id == collar_id).first()
+                
+                if not collar:
+                    raise NoResultFound(f"No collar found with ID {collar_id}")
 
-        # Actualizar el pet_id
-        collar.pet_id = new_pet_id
-        self.db.commit()
-        self.db.refresh(collar)
+                # Actualizar solo los campos específicos
+                if collar_data.temperature is not None:
+                    collar.temperature = collar_data.temperature
+                if collar_data.lpm is not None:
+                    collar.lpm = collar_data.lpm
+                if collar_data.battery is not None:
+                    collar.battery = collar_data.battery
+                if collar_data.location and collar_data.location.latitude is not None and collar_data.location.longitude is not None:
+                    collar.latitude = collar_data.location.latitude
+                    collar.longitude = collar_data.location.longitude
 
-        return f"{pet.name} is now associated with collar {collar.serial_number}"
+                self.db.commit()
+                self.db.refresh(collar)
+
+                # Crear una respuesta con los datos actualizados
+                location = LocationType(latitude=collar.latitude, longitude=collar.longitude)
+                return SmartCollarResponse(
+                    id=collar.id,
+                    serial_number=collar.serial_number,
+                    temperature=collar.temperature,
+                    lpm=collar.lpm,
+                    battery=collar.battery,
+                    location=location,
+                    pet_id=collar.pet_id
+                )
+            except NoResultFound:
+                raise ValueError(f"No collar found with ID {collar_id}")

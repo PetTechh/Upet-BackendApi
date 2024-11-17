@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import json
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
 from sqlalchemy.orm import Session
-from SmartCollar.Application.Schema.smart_collar_schema import SmartCollarRequest, SmartCollarResponse
+from SmartCollar.Application.Schema.smart_collar_schema import SmartCollarRequest, SmartCollarResponse, SmartCollarUpdateRequest
 from SmartCollar.Application.Services.smart_collar_service import SmartCollarService
 from config.db import get_db
 
@@ -34,4 +35,13 @@ def change_pet_association(collar_id: int, new_pet_id: int, db: Session = Depend
     try:
         return service.change_pet_association(collar_id, new_pet_id)
     except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+@smart_collar.put("/smart-collars/{collar_id}", response_model=SmartCollarResponse)
+def update_smart_collar(collar_id: int, collar_data: SmartCollarUpdateRequest, db: Session = Depends(get_db)):
+    service = SmartCollarService(db)
+    try:
+        updated_collar = service.update_smart_collar(collar_id, collar_data)
+        return updated_collar
+    except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
