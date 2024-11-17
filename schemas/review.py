@@ -8,13 +8,12 @@ from schemas.petOwner import PetOwnerSchemaGet
 class ReviewSchemaPost(BaseModel):
     description : str
     stars : int
-    veterinarian_id : int
 
-    def to_model(self, pet_Owner_id) -> Review:
+    def to_model(self, pet_Owner_id, veterinarian_id) -> Review:
         return Review(
             description=self.description,
             stars=self.stars,
-            veterinarian_id=self.veterinarian_id,
+            veterinarian_id= veterinarian_id,
             petowner_id=pet_Owner_id
         )
     

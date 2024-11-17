@@ -22,3 +22,4 @@ class Appointment(Base):
     
     pet = relationship('Pet', back_populates='appointments')
     veterinarian = relationship('Veterinarian', back_populates='appointments')
+    

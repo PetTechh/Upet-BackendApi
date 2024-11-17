@@ -1,5 +1,4 @@
 from datetime import datetime
-from django.template import engines
 from sqlalchemy.orm import sessionmaker
 from fastapi import Depends
 from sqlalchemy.orm import Session
