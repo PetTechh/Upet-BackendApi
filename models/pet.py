@@ -8,10 +8,10 @@ from models.petOwner import PetOwner
 class Pet(Base):
     __tablename__ = 'pets'
     id = Column(Integer, primary_key=True, index=True)
-    name= Column(String(255))
+    name = Column(String(255))
     petOwnerId = Column(Integer, ForeignKey('petowners.id'))
     breed = Column(String(255))
-    species = Column(Enum(SpecieEnum,name='species_enum'), nullable=False)
+    species = Column(Enum(SpecieEnum, name='species_enum'), nullable=False)
     weight = Column(DECIMAL)
     birthdate = Column(Date)
     image_url = Column(String(255), default="https://image.freepik.com/vector-gratis/ilustracion-vector-dibujos-animados-lindo-animal-mascota_24640-53565.jpg")
@@ -19,5 +19,4 @@ class Pet(Base):
 
     pet_owner = relationship("PetOwner", back_populates="pets")
     appointments = relationship('Appointment', back_populates='pet')
-
-
+    smartcollars = relationship("SmartCollar", back_populates="pet") 
