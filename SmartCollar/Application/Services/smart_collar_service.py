@@ -180,3 +180,31 @@ class SmartCollarService:
             )
         except NoResultFound:
             raise ValueError(f"No collar found with ID {collar_id}")
+        
+    def disassociate_smart_collar(self, collar_id: int) -> SmartCollarResponse:
+        try:
+            # Buscar el collar en la base de datos
+            collar = self.db.query(SmartCollar).filter(SmartCollar.id == collar_id).first()
+            
+            if not collar:
+                raise NoResultFound(f"No collar found with ID {collar_id}")
+
+            # Desasociar el collar estableciendo pet_id a None
+            collar.pet_id = None
+
+            self.db.commit()
+            self.db.refresh(collar)
+
+            # Crear una respuesta con los datos actualizados
+            location = LocationType(latitude=collar.latitude, longitude=collar.longitude)
+            return SmartCollarResponse(
+                id=collar.id,
+                serial_number=collar.serial_number,
+                temperature=collar.temperature,
+                lpm=collar.lpm,
+                battery=collar.battery,
+                location=location,
+                pet_id=collar.pet_id  # pet_id ahora será None
+            )
+        except NoResultFound:
+            raise ValueError(f"No collar found with ID {collar_id}")

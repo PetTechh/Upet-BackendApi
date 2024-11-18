@@ -45,8 +45,8 @@ def get_vet_by_id_details(vet_id: int, db: Session = Depends(get_db)):
     return VeterinarianService.get_vet_by_id_details(vet_id, db)
 
 @veterinarians.post(endpoint + "/{vet_id}/available_times", status_code=status.HTTP_200_OK, tags=[tag])
-def get_available_times(clinic_id: int, day: AvailabilitySchemaPost, db: Session = Depends(get_db)):
-    return VeterinarianService.get_available_times(clinic_id, day.date, db)
+def get_available_times(vet_id: int, day: AvailabilitySchemaPost, db: Session = Depends(get_db)):
+    return VeterinarianService.get_available_times(vet_id, day.date, db)
 
 @veterinarians.put(endpoint + "/{vet_id}", response_model=VeterinarianSchemaGet, status_code=status.HTTP_200_OK, tags=[tag])
 def change_vet_information(vet_id: int, vet: VeterinarianUpdateInformation, db: Session = Depends(get_db)):
