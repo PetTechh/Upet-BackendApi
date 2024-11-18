@@ -61,3 +61,12 @@ def get_smart_collars_by_pet_id(pet_id: int, db: Session = Depends(get_db)):
         return service.get_by_pet_id(pet_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    
+@smart_collar.post("/smart-collars/{collar_id}")
+def dessociate_pet(collar_id: int, db: Session = Depends(get_db)):
+    service = SmartCollarService(db)
+    try:
+        return service.disassociate_smart_collar(collar_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+                   
