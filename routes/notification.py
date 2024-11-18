@@ -4,36 +4,40 @@ from config.db import get_db
 from models.petOwner import PetOwner
 from models.notification import Notification
 from schemas.notification import NotificationSchemaGet, NotificationSchemaPost
+from services.notification import NotificationService
 
 notifications = APIRouter()
 tag = "Notifications"
 
 endpoint = "/notifications"
 
-@notifications.post(endpoint, response_model=NotificationSchemaGet, status_code=status.HTTP_201_CREATED, tags=[tag])
-def create_notification(notification: NotificationSchemaPost, db: Session = Depends(get_db)):
-    pet_owner = db.query(PetOwner).filter(PetOwner.id == notification.petOwnerId).first()
-    if not pet_owner:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El propietario de mascota no existe.")
-    
-    new_notification = Notification(**notification.dict())
-    db.add(new_notification)
-    db.commit()
-    return new_notification
+@notifications.get("/notifications/pet-owner/{pet_owner_id}")
+def get_notifications_by_pet_owner(pet_owner_id: int, db: Session = Depends(get_db)):
+    """
+    Obtener todas las notificaciones para un PetOwner específico.
+    """
+    notification_service = NotificationService(db)
+    notifications = notification_service.get_notifications_by_pet_owner(pet_owner_id)
+    if not notifications:
+        raise HTTPException(status_code=404, detail="No notifications found for the given PetOwner.")
+    return notifications
 
-@notifications.get(endpoint, response_model=list[NotificationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
-def get_notifications(db: Session = Depends(get_db)):
-    return db.query(Notification).all()
+@notifications.get("/notifications/veterinarian/{veterinarian_id}")
+def get_notifications_by_veterinarian(veterinarian_id: int, db: Session = Depends(get_db)):
+    """
+    Obtener todas las notificaciones para un Veterinarian específico.
+    """
+    notification_service = NotificationService(db)
+    notifications = notification_service.get_notifications_by_veterinarian(veterinarian_id)
+    if not notifications:
+        raise HTTPException(status_code=404, detail="No notifications found for the given Veterinarian.")
+    return notifications
 
-@notifications.get(endpoint + "/petowner/{petowner_id}", response_model=list[NotificationSchemaGet], status_code=status.HTTP_200_OK, tags=[tag])
-def get_notifications_by_petowner_id(petowner_id: int, db: Session = Depends(get_db)):
-    pet_owner = db.query(PetOwner).filter(PetOwner.id == petowner_id).first()
-    if not pet_owner:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El propietario de mascota no existe.")
-    
-    notifications = db.query(Notification).filter(Notification.petOwnerId == petowner_id).all()
-    
-    if notifications == []:
-        print("El propietario de mascota no tiene notificaciones.")
-    
+@notifications.get("/notifications")
+def get_all_notifications(db: Session = Depends(get_db)):
+    """
+    Obtener todas las notificaciones en la base de datos.
+    """
+    notification_service = NotificationService(db)
+    notifications = notification_service.get_all_notifications()
     return notifications
