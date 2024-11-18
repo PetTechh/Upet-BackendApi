@@ -152,3 +152,31 @@ class SmartCollarService:
                 ))
 
             return collar_responses
+
+    def change_pet_association(self, collar_id: int, new_pet_id: int) -> SmartCollarResponse:
+        try:
+            # Buscar el collar en la base de datos
+            collar = self.db.query(SmartCollar).filter(SmartCollar.id == collar_id).first()
+            
+            if not collar:
+                raise NoResultFound(f"No collar found with ID {collar_id}")
+
+            # Actualizar el pet_id del collar
+            collar.pet_id = new_pet_id
+
+            self.db.commit()
+            self.db.refresh(collar)
+
+            # Crear una respuesta con los datos actualizados
+            location = LocationType(latitude=collar.latitude, longitude=collar.longitude)
+            return SmartCollarResponse(
+                id=collar.id,
+                serial_number=collar.serial_number,
+                temperature=collar.temperature,
+                lpm=collar.lpm,
+                battery=collar.battery,
+                location=location,
+                pet_id=collar.pet_id
+            )
+        except NoResultFound:
+            raise ValueError(f"No collar found with ID {collar_id}")
