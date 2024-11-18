@@ -17,5 +17,4 @@ class PetOwner(Base):
     reviews = relationship('Review', back_populates='petowner')  # Relación con Review
 
 from models.user import User
-from models.pet import Pet
 from models.review import Review
