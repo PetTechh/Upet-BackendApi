@@ -12,6 +12,7 @@ class VeterinarianSchemaPost(BaseModel):
 class VeterinarianUpdateInformation(BaseModel):
     name: str
     description: Optional[str]
+    image_url: Optional[str]
     experience: Optional[int]    
     
 class VeterinarianSchemaGet(BaseModel):
@@ -43,6 +44,7 @@ class VeterinarianSchemaGet(BaseModel):
         veterinarian.user.name = newInformation.name
         veterinarian.description = newInformation.description
         veterinarian.experience = newInformation.experience
+        veterinarian.user.image_url=newInformation.image_url
         return veterinarian 
     
 class VeterinarianProfileSchemaGet(BaseModel):
