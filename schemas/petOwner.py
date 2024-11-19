@@ -11,6 +11,7 @@ class PetOwnerUpdateInformation(BaseModel):
     numberPhone: str
     location: str
     name : str
+    image_url : str
 
 class PetOwnerSchemaGet(BaseModel):
     id: int
@@ -39,4 +40,5 @@ class PetOwnerSchemaGet(BaseModel):
         petOwner.location = newInformation.location
         petOwner.numberPhone = newInformation.numberPhone
         petOwner.user.name = newInformation.name
+        petOwner.user.image_url = newInformation.image_url
         return petOwner
